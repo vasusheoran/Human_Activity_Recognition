@@ -11,11 +11,11 @@ class TensorFlowClassifier {
     }
 
     private TensorFlowInferenceInterface inferenceInterface;
-    private static final String MODEL_FILE = "file:///android_asset/cnn/v2/best_model.0.95-1.00-07-0.21.tflite";
-    private static final String INPUT_NODE = "conv2d_1_input_1";
-    private static final String[] OUTPUT_NODES = {"dense_3_1/Softmax"};
-    private static final String OUTPUT_NODE = "dense_3_1/Softmax";
-    private static final long[] INPUT_SIZE = {1, 100, 11, 1};
+    private static final String MODEL_FILE = "file:///android_asset/best_model.0.94-0.90-07-0.52.tflite";
+    private static final String INPUT_NODE = "conv2d_2_input";
+    private static final String[] OUTPUT_NODES = {"dense_6/Softmax"};
+    private static final String OUTPUT_NODE = "dense_6/Softmax";
+    private static final long[] INPUT_SIZE = {1, 100, 6, 1};
     private static final int OUTPUT_SIZE = 3;
 
     TensorFlowClassifier(final Context context) {

@@ -20,7 +20,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
-    private static final int N_SAMPLES = 10;
+    private static final int N_SAMPLES = 100;
     private static List<Float> x;
     private static List<Float> y;
     private static List<Float> z;
