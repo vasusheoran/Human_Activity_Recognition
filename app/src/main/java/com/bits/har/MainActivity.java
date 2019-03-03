@@ -21,9 +21,12 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
     private static final int N_SAMPLES = 100;
-    private static List<Float> x;
-    private static List<Float> y;
-    private static List<Float> z;
+    private static List<Float> ax;
+    private static List<Float> ay;
+    private static List<Float> az;
+    private static List<Float> gx;
+    private static List<Float> gy;
+    private static List<Float> gz;
     private TextView downstairsTextView;
 
     private TextView joggingTextView;
@@ -43,9 +46,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        x = new ArrayList<>();
-        y = new ArrayList<>();
-        z = new ArrayList<>();
+        ax = new ArrayList<>();
+        ay = new ArrayList<>();
+        az = new ArrayList<>();
+        gx = new ArrayList<>();
+        gy = new ArrayList<>();
+        gz = new ArrayList<>();
 
 //        downstairsTextView = (TextView) findViewById(R.id.downstairs_prob);
         joggingTextView = (TextView) findViewById(R.id.jogging_prob);
@@ -96,15 +102,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onResume() {
         super.onResume();
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
+        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         activityPrediction();
-        x.add(event.values[0]);
-        y.add(event.values[1]);
-        z.add(event.values[2]);
+        final int type = event.sensor.getType();
+        if (type == Sensor.TYPE_ACCELEROMETER) {
+            //Smoothing the sensor data a bit
+            ax.add(event.values[0]);
+            ay.add(event.values[1]);
+            az.add(event.values[2]);
+
+        }
+        if (type == Sensor.TYPE_GYROSCOPE) {
+            //Smoothing the sensor data a bit
+            gx.add(event.values[0]);
+            gy.add(event.values[1]);
+            gz.add(event.values[2]);
+        }
     }
 
     @Override
@@ -113,13 +131,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void activityPrediction() {
-        if (x.size() == N_SAMPLES && y.size() == N_SAMPLES && z.size() == N_SAMPLES) {
+        Log.v(TAG, "Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
+        if (ax.size() == N_SAMPLES && ay.size() == N_SAMPLES && az.size() == N_SAMPLES && gx.size() == N_SAMPLES && gy.size() == N_SAMPLES && gz.size() == N_SAMPLES) {
+
+            Log.v(TAG, "Inside Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
             List<Float> data = new ArrayList<>();
-            data.addAll(x);
-            data.addAll(y);
-            data.addAll(z);
+            data.addAll(ax);
+            data.addAll(ay);
+            data.addAll(az);
+            data.addAll(gx);
+            data.addAll(gy);
+            data.addAll(gz);
 
             results = classifier.predictProbabilities(toFloatArray(data));
+            //Log.v(TAG, results.toString());
 /*
             downstairsTextView.setText(Float.toString(round(results[0], 2)));
             joggingTextView.setText(Float.toString(round(results[1], 2)));
@@ -133,9 +158,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             standingTextView.setText(Float.toString(round(results[1], 2)));
             walkingTextView.setText(Float.toString(round(results[2], 2)));
 
-            x.clear();
-            y.clear();
-            z.clear();
+            ax.clear();
+            ay.clear();
+            az.clear();
+            gx.clear();
+            gy.clear();
+            gz.clear();
+        }
+        if(ax.size() == 101){
+            ax.remove(0);
+            ay.remove(0);
+            az.remove(0);
         }
     }
 
