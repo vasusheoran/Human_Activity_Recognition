@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,12 +23,12 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
     private static final int N_SAMPLES = 100;
-    private static List<Float> ax;
-    private static List<Float> ay;
-    private static List<Float> az;
-    private static List<Float> gx;
-    private static List<Float> gy;
-    private static List<Float> gz;
+    private static Queue<Float> ax;
+    private static Queue<Float> ay;
+    private static Queue<Float> az;
+    private static Queue<Float> gx;
+    private static Queue<Float> gy;
+    private static Queue<Float> gz;
     private TextView downstairsTextView;
 
     private TextView joggingTextView;
@@ -46,12 +48,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ax = new ArrayList<>();
-        ay = new ArrayList<>();
-        az = new ArrayList<>();
-        gx = new ArrayList<>();
-        gy = new ArrayList<>();
-        gz = new ArrayList<>();
+        ax = new LinkedList<>();
+        ay = new LinkedList<>();
+        az = new LinkedList<>();
+        gx = new LinkedList<>();
+        gy = new LinkedList<>();
+        gz = new LinkedList<>();
 
 //        downstairsTextView = (TextView) findViewById(R.id.downstairs_prob);
         joggingTextView = (TextView) findViewById(R.id.jogging_prob);
@@ -102,8 +104,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onResume() {
         super.onResume();
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
+        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -123,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             gy.add(event.values[1]);
             gz.add(event.values[2]);
         }
+
     }
 
     @Override
@@ -166,9 +169,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             gz.clear();
         }
         if(ax.size() == 101){
-            ax.remove(0);
-            ay.remove(0);
-            az.remove(0);
+            ax.remove();
+            ay.remove();
+            az.remove();
+        }
+        if(gx.size() == 101){
+            gx.remove();
+            gy.remove();
+            gz.remove();
         }
     }
 
