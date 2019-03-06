@@ -331,7 +331,7 @@ public class FilterSensorData implements SensorEventListener {
 
             // Update sensor output in GUI
             //mHandler.post(updateOreintationDisplayTask);
-            updateAxis(Constants.GYROSCOPE);
+            updateAxis(Constants.FUSEDORIENTATION);
         }
     }
 
@@ -339,27 +339,34 @@ public class FilterSensorData implements SensorEventListener {
 
     public void updateAxis(int val) {
 //        float [][] =
+
         switch (val){
             case Constants.GYROSCOPE:
-//                data.add(gyro);
-//                data.add()
+                ActivityPrediction.gyroX.add(gyroOrientation[0]);
+                ActivityPrediction.gyroY.add(gyroOrientation[1]);
+                ActivityPrediction.gyroZ.add(gyroOrientation[2]);
                 break;
             case Constants.ACCELEROMETER:
+                ActivityPrediction.fusedOrientationX.add(accMagOrientation[0]);
+                ActivityPrediction.fusedOrientationY.add(accMagOrientation[1]);
+                ActivityPrediction.fusedOrientationZ.add(accMagOrientation[2]);
                 break;
             case Constants.MAGNETOMETER:
                 break;
             case Constants.FUSEDORIENTATION:
-
+                ActivityPrediction.fusedOrientationX.add(fusedOrientation[0]);
+                ActivityPrediction.fusedOrientationY.add(fusedOrientation[1]);
+                ActivityPrediction.fusedOrientationZ.add(fusedOrientation[2]);
                 break;
         }
 
-        float pitchOut = 0, rollOut = 0;
+        float[] data = {gyroOrientation[0],gyroOrientation[1],gyroOrientation[2],accMagOrientation[0],
+                accMagOrientation[1],accMagOrientation[2],fusedOrientation[0],fusedOrientation[1],fusedOrientation[2]};
+        
+        writeToFile(data);
 
-        pitchOut = fusedOrientation[1];
-        rollOut = fusedOrientation[2];
+    }
 
-        pitch = d.format(pitchOut * 180 / Math.PI);
-        roll = d.format(rollOut * 180 / Math.PI);
-        coefficient = d.format(tempFilter_coefficient);
+    private void writeToFile(float[] data) {
     }
 }

@@ -13,13 +13,18 @@ public class ActivityPrediction {
     private static final String TAG = "MyActivity";
 
     private static final int N_SAMPLES = 100;
-    public static Queue<Float> ax;
-    public static Queue<Float> ay;
-    public static Queue<Float> az;
-    public static Queue<Float> gx;
-    public static Queue<Float> gy;
-    public static Queue<Float> gz;
-    public static Queue<Float> ox;
+    public static Queue<Float> accX;
+    public static Queue<Float> accY;
+    public static Queue<Float> accZ;
+    public static Queue<Float> gyroX;
+    public static Queue<Float> gyroY;
+    public static Queue<Float> gyroZ;
+    public static Queue<Float> accMagOrientationX;
+    public static Queue<Float> accMagOrientationY;
+    public static Queue<Float> accMagOrientationZ;
+    public static Queue<Float> fusedOrientationX;
+    public static Queue<Float> fusedOrientationY;
+    public static Queue<Float> fusedOrientationZ;
 
     private String previousResult;
     private TensorFlowClassifier classifier;
