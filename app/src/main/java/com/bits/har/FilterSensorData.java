@@ -18,11 +18,11 @@ public class FilterSensorData implements SensorEventListener {
 
 
     private static final int N_SAMPLES = 100;
-    private TensorFlowClassifier classifier;
+    private TensorFlowClassifier classifier = null;
 
     private static final String TAG = "FilterSensorData";
     // Stores information about all the different sensors
-    private SensorManager mSensorManager = null;
+    private SensorManager mSensorManager;
     private Context context;
 
     // angular speeds from gyro
@@ -44,17 +44,12 @@ public class FilterSensorData implements SensorEventListener {
     // data for activity prediction
     List<Float> data = new ArrayList<>();
 
-    //public String azimut;
-    public String pitch;
-    public String roll;
-    public String coefficient;
-
-    public static final float EPSILON = 0.000000001f;
+    private static final float EPSILON = 0.000000001f;
     private static final float NS2S = 1.0f / 1000000000.0f;
     private float timestamp;
     private boolean initState = true;
 
-    public static final int TIME_CONSTANT = 30;
+    private static final int TIME_CONSTANT = 30;
     public float filter_coefficient = 0.90f;
     public float tempFilter_coefficient = filter_coefficient;
     protected DecimalFormat d = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ENGLISH);
@@ -139,7 +134,7 @@ public class FilterSensorData implements SensorEventListener {
 
 
     // Calculates orientation angles from accelerometer and magnetometer output
-    public void calculateAccMagOrientation(SensorEvent event) {
+    private void calculateAccMagOrientation(SensorEvent event) {
         if (SensorManager.getRotationMatrix(rotationMatrix, null, accel, magnet)) {
             SensorManager.getOrientation(rotationMatrix, accMagOrientation);
         }
@@ -176,7 +171,7 @@ public class FilterSensorData implements SensorEventListener {
 
     // This function performs the integration of the gyroscope data.
     // It writes the gyroscope based orientation into gyroOrientation.
-    public void gyroFunction(SensorEvent event) {
+    private void gyroFunction(SensorEvent event) {
         // Don't start until first accelerometer/magnetometer orientation has been acquired
         if (accMagOrientation == null)
             return;
