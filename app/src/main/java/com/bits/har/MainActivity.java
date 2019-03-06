@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //if(previousResult!=labels[idx]){
                     textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
                     previousResult = labels[idx];
+                    Log.v(TAG, "Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
                 /*}else{
                     Log.v(TAG, "Activity Unchanged");
                 }*/
@@ -134,10 +135,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void activityPrediction() {
-        Log.v(TAG, "Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
+//
         if (ax.size() == N_SAMPLES && ay.size() == N_SAMPLES && az.size() == N_SAMPLES && gx.size() == N_SAMPLES && gy.size() == N_SAMPLES && gz.size() == N_SAMPLES) {
 
-            Log.v(TAG, "Inside Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
+//            Log.v(TAG, "Inside Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
             List<Float> data = new ArrayList<>();
             data.addAll(ax);
             data.addAll(ay);
