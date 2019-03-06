@@ -6,17 +6,21 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class FilterSensorData implements SensorEventListener {
 
-    private static final String TAG = "FilterSensorData";
 
+    private static final int N_SAMPLES = 100;
+    private TensorFlowClassifier classifier;
+
+    private static final String TAG = "FilterSensorData";
     // Stores information about all the different sensors
     private SensorManager mSensorManager = null;
     private Context context;
@@ -37,6 +41,8 @@ public class FilterSensorData implements SensorEventListener {
     private float[] fusedOrientation = new float[3];
     // accelerometer and magnetometer based rotation matrix
     private float[] rotationMatrix = new float[9];
+    // data for activity prediction
+    List<Float> data = new ArrayList<>();
 
     //public String azimut;
     public String pitch;
@@ -98,6 +104,10 @@ public class FilterSensorData implements SensorEventListener {
             mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    public void unregisterListeners() {
+        mSensorManager.unregisterListener(this);
+    }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
@@ -109,16 +119,19 @@ public class FilterSensorData implements SensorEventListener {
                 // Copy new accelerometer data into accel array and calculate orientation
                 System.arraycopy(event.values, 0, accel, 0, 3);
                 calculateAccMagOrientation(event);
+                updateAxis(Constants.ACCELEROMETER);
                 break;
 
             case Sensor.TYPE_GYROSCOPE:
                 // Process gyro data
                 gyroFunction(event);
+                updateAxis(Constants.GYROSCOPE);
                 break;
 
             case Sensor.TYPE_MAGNETIC_FIELD:
                 // Copy new magnetometer data into magnet array
                 System.arraycopy(event.values, 0, magnet, 0, 3);
+                updateAxis(Constants.MAGNETOMETER);
                 break;
         }
     }
@@ -129,9 +142,6 @@ public class FilterSensorData implements SensorEventListener {
     public void calculateAccMagOrientation(SensorEvent event) {
         if (SensorManager.getRotationMatrix(rotationMatrix, null, accel, magnet)) {
             SensorManager.getOrientation(rotationMatrix, accMagOrientation);
-            MainActivity.ax.add( event.values[0]);
-            MainActivity.ay.add( event.values[0]);
-            MainActivity.az.add( event.values[0]);
         }
     }
 
@@ -321,13 +331,28 @@ public class FilterSensorData implements SensorEventListener {
 
             // Update sensor output in GUI
             //mHandler.post(updateOreintationDisplayTask);
-            updateOreintationDisplay();
+            updateAxis(Constants.GYROSCOPE);
         }
     }
 
 
 
-    public void updateOreintationDisplay() {
+    public void updateAxis(int val) {
+//        float [][] =
+        switch (val){
+            case Constants.GYROSCOPE:
+//                data.add(gyro);
+//                data.add()
+                break;
+            case Constants.ACCELEROMETER:
+                break;
+            case Constants.MAGNETOMETER:
+                break;
+            case Constants.FUSEDORIENTATION:
+
+                break;
+        }
+
         float pitchOut = 0, rollOut = 0;
 
         pitchOut = fusedOrientation[1];

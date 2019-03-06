@@ -1,12 +1,15 @@
 package com.bits.har;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,44 +25,70 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+    private static final String TAG = "MyActivity";
 
     public static Activity activity;
 
-    private static final int N_SAMPLES = 100;
+    /*private static final int N_SAMPLES = 100;
     public static Queue<Float> ax;
     public static Queue<Float> ay;
     public static Queue<Float> az;
     public static Queue<Float> gx;
     public static Queue<Float> gy;
-    public static Queue<Float> gz;
+    public static Queue<Float> gz;*/
+
     private TextView downstairsTextView;
+    public static FilterSensorData mFilterSensorData = null;
+
+
+    public static String accValue = "";
+    public static String gyroValue = "";
+    public static String kalmanValue = "";
+    public static boolean newIMUValues;
+
+    public static String Qangle = "";
+    public static String Qbias = "";
+    public static String Rmeasure = "";
+    public static boolean newKalmanValues;
+
+    public static String pValue = "";
+    public static String iValue = "";
+    public static String dValue = "";
+    public static String targetAngleValue = "";
+    public static boolean newPIDValues;
+
+    public static boolean backToSpot;
+    public static int maxAngle = 8; // Eight is the default value
+    public static int maxTurning = 20; // Twenty is the default value
 
     private TextView joggingTextView;
-    private TextView sittingTextView;
+//    private TextView sittingTextView;
     private TextView standingTextView;
-    private TextView upstairsTextView;
+//    private TextView upstairsTextView;
     private TextView walkingTextView;
     private TextToSpeech textToSpeech;
-    private float[] results;
+
+    public float[] results;
     private String previousResult;
     private TensorFlowClassifier classifier;
 
     private String[] labels = {"Jogging", "Standing","Walking"};
 //    private String[] labels = {"Downstairs", "Jogging", "Sitting", "Standing", "Upstairs", "Walking"};
-    private static final String TAG = "MyActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set portrait mode only - for small screens like phones
         setContentView(R.layout.activity_main);
-        ax = new LinkedList<>();
+        /*ax = new LinkedList<>();
         ay = new LinkedList<>();
         az = new LinkedList<>();
         gx = new LinkedList<>();
         gy = new LinkedList<>();
-        gz = new LinkedList<>();
+        gz = new LinkedList<>();*/
+
+        setSensorManager(getApplicationContext());
 
 //        downstairsTextView = (TextView) findViewById(R.id.downstairs_prob);
         joggingTextView = (TextView) findViewById(R.id.jogging_prob);
@@ -73,6 +102,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
         previousResult = "";
+    }
+
+    private void setSensorManager(Context applicationContext) {
+
+        SensorManager mSensorManger = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mFilterSensorData = new FilterSensorData(getApplicationContext(),mSensorManger);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this); // Create SharedPreferences instance
+        String filterCoefficient = preferences.getString("filterCoefficient", null); // Read the stored value for filter coefficient
+        if (filterCoefficient != null) {
+            mFilterSensorData.filter_coefficient = Float.parseFloat(filterCoefficient);
+            mFilterSensorData.tempFilter_coefficient = mFilterSensorData.filter_coefficient;
+        }
+        // Read the previous back to spot value
+        backToSpot = preferences.getBoolean("backToSpot", true); // Back to spot is true by default
+        // Read the previous max angle
+        maxAngle = preferences.getInt("maxAngle", 8); // Eight is the default value
+        // Read the previous max turning value
+        maxTurning = preferences.getInt("maxTurning", 20); // Twenty is the default value
     }
 
     @Override
@@ -103,92 +151,47 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }, 2000, 5000);
     }
 
+    @Override
     protected void onPause() {
-        getSensorManager().unregisterListener(this);
         super.onPause();
+        mFilterSensorData.unregisterListeners();
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+        mFilterSensorData.initListeners();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mFilterSensorData.unregisterListeners();
+
+        // Store the value for FILTER_COEFFICIENT and max angle at shutdown
+        SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        edit.putString("filterCoefficient", Float.toString(mFilterSensorData.filter_coefficient));
+        edit.putBoolean("backToSpot", backToSpot);
+        edit.putInt("maxAngle", maxAngle);
+        edit.putInt("maxTurning", maxTurning);
+        edit.commit();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mFilterSensorData.unregisterListeners();
     }
 
     public static int getRotation() {
         return activity.getWindowManager().getDefaultDisplay().getRotation();
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        activityPrediction();
-        final int type = event.sensor.getType();
-        if (type == Sensor.TYPE_ACCELEROMETER) {
-            //Smoothing the sensor data a bit
-            ax.add(event.values[0]);
-            ay.add(event.values[1]);
-            az.add(event.values[2]);
-
-        }
-        if (type == Sensor.TYPE_GYROSCOPE) {
-            //Smoothing the sensor data a bit
-            gx.add(event.values[0]);
-            gy.add(event.values[1]);
-            gz.add(event.values[2]);
-        }
-
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
-
-    private void activityPrediction() {
-        Log.v(TAG, "Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
-        if (ax.size() == N_SAMPLES && ay.size() == N_SAMPLES && az.size() == N_SAMPLES && gx.size() == N_SAMPLES && gy.size() == N_SAMPLES && gz.size() == N_SAMPLES) {
-
-            Log.v(TAG, "Inside Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
-            List<Float> data = new ArrayList<>();
-            data.addAll(ax);
-            data.addAll(ay);
-            data.addAll(az);
-            data.addAll(gx);
-            data.addAll(gy);
-            data.addAll(gz);
-
-            results = classifier.predictProbabilities(toFloatArray(data));
-            //Log.v(TAG, results.toString());
-/*
-            downstairsTextView.setText(Float.toString(round(results[0], 2)));
-            joggingTextView.setText(Float.toString(round(results[1], 2)));
-            sittingTextView.setText(Float.toString(round(results[2], 2)));
-            standingTextView.setText(Float.toString(round(results[3], 2)));
-            upstairsTextView.setText(Float.toString(round(results[4], 2)));
-            walkingTextView.setText(Float.toString(round(results[5], 2)));
-            */
-
+    private void setTextToSpeech() {
             joggingTextView.setText(Float.toString(round(results[0], 2)));
             standingTextView.setText(Float.toString(round(results[1], 2)));
-            walkingTextView.setText(Float.toString(round(results[2], 2)));
-
-            ax.clear();
-            ay.clear();
-            az.clear();
-            gx.clear();
-            gy.clear();
-            gz.clear();
-        }
-        if(ax.size() == 101){
-            ax.remove();
-            ay.remove();
-            az.remove();
-        }
-        if(gx.size() == 101){
-            gx.remove();
-            gy.remove();
-            gz.remove();
-        }
-    }
+            walkingTextView.setText(Float.toString(round(results[2], 2)));    }
 
     private float[] toFloatArray(List<Float> list) {
         int i = 0;
@@ -204,10 +207,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
-    }
-
-    private SensorManager getSensorManager() {
-        return (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
 }
