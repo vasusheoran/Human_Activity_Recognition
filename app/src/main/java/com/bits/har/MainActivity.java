@@ -1,5 +1,7 @@
 package com.bits.har;
 
+import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,13 +24,15 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
+    public static Activity activity;
+
     private static final int N_SAMPLES = 100;
-    private static Queue<Float> ax;
-    private static Queue<Float> ay;
-    private static Queue<Float> az;
-    private static Queue<Float> gx;
-    private static Queue<Float> gy;
-    private static Queue<Float> gz;
+    public static Queue<Float> ax;
+    public static Queue<Float> ay;
+    public static Queue<Float> az;
+    public static Queue<Float> gx;
+    public static Queue<Float> gy;
+    public static Queue<Float> gz;
     private TextView downstairsTextView;
 
     private TextView joggingTextView;
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set portrait mode only - for small screens like phones
         setContentView(R.layout.activity_main);
         ax = new LinkedList<>();
         ay = new LinkedList<>();
@@ -106,6 +112,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
         getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    public static int getRotation() {
+        return activity.getWindowManager().getDefaultDisplay().getRotation();
     }
 
     @Override

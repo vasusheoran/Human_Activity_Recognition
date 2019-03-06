@@ -108,7 +108,7 @@ public class FilterSensorData implements SensorEventListener {
             case Sensor.TYPE_ACCELEROMETER:
                 // Copy new accelerometer data into accel array and calculate orientation
                 System.arraycopy(event.values, 0, accel, 0, 3);
-                calculateAccMagOrientation();
+                calculateAccMagOrientation(event);
                 break;
 
             case Sensor.TYPE_GYROSCOPE:
@@ -126,9 +126,12 @@ public class FilterSensorData implements SensorEventListener {
 
 
     // Calculates orientation angles from accelerometer and magnetometer output
-    public void calculateAccMagOrientation() {
+    public void calculateAccMagOrientation(SensorEvent event) {
         if (SensorManager.getRotationMatrix(rotationMatrix, null, accel, magnet)) {
             SensorManager.getOrientation(rotationMatrix, accMagOrientation);
+            MainActivity.ax.add( event.values[0]);
+            MainActivity.ay.add( event.values[0]);
+            MainActivity.az.add( event.values[0]);
         }
     }
 
@@ -318,6 +321,7 @@ public class FilterSensorData implements SensorEventListener {
 
             // Update sensor output in GUI
             //mHandler.post(updateOreintationDisplayTask);
+            updateOreintationDisplay();
         }
     }
 
@@ -326,38 +330,8 @@ public class FilterSensorData implements SensorEventListener {
     public void updateOreintationDisplay() {
         float pitchOut = 0, rollOut = 0;
 
-        switch (IMUOutputSelection) {
-            case 0:
-                pitchOut = accMagOrientation[1];
-                rollOut = accMagOrientation[2];
-                break;
-		/*case 1:
-			mAzimuthView.setText(d.format(gyroOrientation[0] * 180 / Math.PI));
-			mPitchView.setText(d.format(gyroOrientation[1] * 180 / Math.PI));
-			mRollView.setText(d.format(gyroOrientation[2] * 180 / Math.PI));
-			break;*/
-            case 2:
-                pitchOut = fusedOrientation[1];
-                rollOut = fusedOrientation[2];
-                break;
-        }
-
-        if (context.getResources().getBoolean(R.bool.isTablet)) {
-            int rotation = BalanduinoActivity.getRotation();
-            if (rotation == Surface.ROTATION_90) { // Landscape
-                float pitchTemp = pitchOut;
-                pitchOut = rollOut;
-                rollOut = -pitchTemp;
-            } else if (rotation == Surface.ROTATION_180) { // Reverse Portrait
-                pitchOut = -pitchOut;
-                rollOut = -rollOut;
-            } else if (rotation == Surface.ROTATION_270) { // Reverse Landscape
-                float pitchTemp = pitchOut;
-                pitchOut = -rollOut;
-                rollOut = pitchTemp;
-            }
-            //else // We don't do anything in portrait mode
-        }
+        pitchOut = fusedOrientation[1];
+        rollOut = fusedOrientation[2];
 
         pitch = d.format(pitchOut * 180 / Math.PI);
         roll = d.format(rollOut * 180 / Math.PI);
