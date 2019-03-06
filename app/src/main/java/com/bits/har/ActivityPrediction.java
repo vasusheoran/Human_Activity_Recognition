@@ -20,8 +20,6 @@ public class ActivityPrediction {
     public static Queue<Float> gy;
     public static Queue<Float> gz;
     public static Queue<Float> ox;
-    public static Queue<Float> gy;
-    public static Queue<Float> gz;
 
     private String previousResult;
     private TensorFlowClassifier classifier;
