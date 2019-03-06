@@ -13,8 +13,8 @@ class TensorFlowClassifier {
     }
 
     private TensorFlowInferenceInterface inferenceInterface;
-    private static final String MODEL_FILE = "file:///android_asset/fina_graph.tflite";
-    private static final String INPUT_NODE = "Placeholder";
+    private static final String MODEL_FILE = "file:///android_asset/best_model.0.94-0.90-06-0.56.pb";
+    private static final String INPUT_NODE = "conv2d_1_input";
     private static final String[] OUTPUT_NODES = {"dense_3/Softmax"};
     private static final String OUTPUT_NODE = "dense_3/Softmax";
     private static final long[] INPUT_SIZE = {1, 100, 6, 1};

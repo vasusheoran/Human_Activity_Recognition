@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private void activityPrediction() {
 //
-        if (ax.size() == N_SAMPLES && ay.size() == N_SAMPLES && az.size() == N_SAMPLES && gx.size() == N_SAMPLES && gy.size() == N_SAMPLES && gz.size() == N_SAMPLES) {
+        if (ax.size() >= N_SAMPLES && ay.size() >= N_SAMPLES && az.size() >= N_SAMPLES && gx.size() >= N_SAMPLES && gy.size() >= N_SAMPLES && gz.size() >= N_SAMPLES) {
 
 //            Log.v(TAG, "Inside Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
             List<Float> data = new ArrayList<>();
