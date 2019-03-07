@@ -4,26 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TextView;
 
+import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     private static final String TAG = "MyActivity";
@@ -79,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
+       /* FileWrite.FOLDER = new File(Environment.getExternalStorageDirectory()
+                + "/har");*/
+//        FileWrite.readFromFile(activity);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set portrait mode only - for small screens like phones
         setContentView(R.layout.activity_main);
         /*ax = new LinkedList<>();
@@ -99,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         classifier = new TensorFlowClassifier(getApplicationContext());
 
-        textToSpeech = new TextToSpeech(this, this);
+        /*textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
-        previousResult = "";
+        previousResult = "";*/
     }
 
     private void setSensorManager(Context applicationContext) {
@@ -125,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onInit(int status) {
-        Timer timer = new Timer();
+        /*Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -144,11 +138,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 //if(previousResult!=labels[idx]){
                     textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
                     previousResult = labels[idx];
-                /*}else{
+                *//*}else{
                     Log.v(TAG, "Activity Unchanged");
-                }*/
+                }*//*
             }
-        }, 2000, 5000);
+        }, 2000, 5000);*/
     }
 
     @Override

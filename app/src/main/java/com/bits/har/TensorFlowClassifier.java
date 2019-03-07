@@ -11,7 +11,7 @@ class TensorFlowClassifier {
     }
 
     private TensorFlowInferenceInterface inferenceInterface;
-    private static final String MODEL_FILE = "file:///android_asset/best_model.0.94-0.90-07-0.52.pb";
+    private static final String MODEL_FILE = "FOLDER:///android_asset/best_model.0.94-0.90-07-0.52.pb";
     private static final String INPUT_NODE = "conv2d_2_input";
     private static final String[] OUTPUT_NODES = {"dense_6/Softmax"};
     private static final String OUTPUT_NODE = "dense_6/Softmax";

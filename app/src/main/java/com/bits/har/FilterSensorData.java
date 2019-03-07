@@ -1,11 +1,14 @@
 package com.bits.har;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
+import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -14,13 +17,16 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.bits.har.MainActivity.activity;
+
 public class FilterSensorData implements SensorEventListener {
+
+    private static final String TAG = "FilterSensorData";
 
 
     private static final int N_SAMPLES = 100;
     private TensorFlowClassifier classifier = null;
 
-    private static final String TAG = "FilterSensorData";
     // Stores information about all the different sensors
     private SensorManager mSensorManager;
     private Context context;
@@ -109,6 +115,7 @@ public class FilterSensorData implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        //ActivityPrediction.activityPrediction();
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 // Copy new accelerometer data into accel array and calculate orientation
@@ -336,18 +343,25 @@ public class FilterSensorData implements SensorEventListener {
 //        float [][] =
 
         switch (val){
+            // This is must
             case Constants.GYROSCOPE:
                 ActivityPrediction.gyroX.add(gyroOrientation[0]);
                 ActivityPrediction.gyroY.add(gyroOrientation[1]);
                 ActivityPrediction.gyroZ.add(gyroOrientation[2]);
                 break;
+            // This is must
             case Constants.ACCELEROMETER:
-                ActivityPrediction.fusedOrientationX.add(accMagOrientation[0]);
-                ActivityPrediction.fusedOrientationY.add(accMagOrientation[1]);
-                ActivityPrediction.fusedOrientationZ.add(accMagOrientation[2]);
+                ActivityPrediction.accX.add(accel[0]);
+                ActivityPrediction.accY.add(accel[1]);
+                ActivityPrediction.accZ.add(accel[2]);
                 break;
+            //Low Pass Filter
             case Constants.MAGNETOMETER:
+                ActivityPrediction.accMagOrientationX.add(accMagOrientation[0]);
+                ActivityPrediction.accMagOrientationY.add(accMagOrientation[1]);
+                ActivityPrediction.accMagOrientationZ.add(accMagOrientation[2]);
                 break;
+            //High Pass Pass Filter
             case Constants.FUSEDORIENTATION:
                 ActivityPrediction.fusedOrientationX.add(fusedOrientation[0]);
                 ActivityPrediction.fusedOrientationY.add(fusedOrientation[1]);
@@ -355,13 +369,14 @@ public class FilterSensorData implements SensorEventListener {
                 break;
         }
 
-        float[] data = {gyroOrientation[0],gyroOrientation[1],gyroOrientation[2],accMagOrientation[0],
+        /*float[] data = {gyroOrientation[0],gyroOrientation[1],gyroOrientation[2],accMagOrientation[0],
                 accMagOrientation[1],accMagOrientation[2],fusedOrientation[0],fusedOrientation[1],fusedOrientation[2]};
-        
-        writeToFile(data);
+*/
+        String data = System.currentTimeMillis() + "," + accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1] + "," + gyro[2] + "," +
+                magnet[0] + "," + magnet[1] + "," + magnet[2] + "," + gyroOrientation[0] + "," + gyroOrientation[1] + "," + gyroOrientation[2] +
+                "," + fusedOrientation[0] + "," + fusedOrientation[1] + "," + fusedOrientation[2];
+        Log.d(TAG, "Data writter to csv : " + data);
+                //FileWrite.writeToTextFile(data, activity.getApplicationContext());
 
-    }
-
-    private void writeToFile(float[] data) {
     }
 }
