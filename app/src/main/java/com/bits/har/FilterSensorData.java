@@ -1,6 +1,5 @@
 package com.bits.har;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -8,7 +7,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-import java.io.OutputStreamWriter;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.bits.har.MainActivity.activity;
 
 public class FilterSensorData implements SensorEventListener {
 
@@ -53,9 +51,10 @@ public class FilterSensorData implements SensorEventListener {
     private static final float EPSILON = 0.000000001f;
     private static final float NS2S = 1.0f / 1000000000.0f;
     private float timestamp;
+    private long previousTimeStamp = 0l;
     private boolean initState = true;
 
-    private static final int TIME_CONSTANT = 30;
+    private static final int TIME_CONSTANT = 1;
     public float filter_coefficient = 0.90f;
     public float tempFilter_coefficient = filter_coefficient;
     protected DecimalFormat d = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ENGLISH);
@@ -116,26 +115,33 @@ public class FilterSensorData implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         //ActivityPrediction.activityPrediction();
+//        long curTimestamp = System.currentTimeMillis();
+        //long stamp = System.currentTimeMillis();
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 // Copy new accelerometer data into accel array and calculate orientation
                 System.arraycopy(event.values, 0, accel, 0, 3);
                 calculateAccMagOrientation(event);
-                updateAxis(Constants.ACCELEROMETER);
-                break;
+
+               /* if(curTimestamp - previousTimeStamp > 10)
+                    updateAxis(Constants.ACCELEROMETER, event.values);
+                break;*/
 
             case Sensor.TYPE_GYROSCOPE:
                 // Process gyro data
                 gyroFunction(event);
-                updateAxis(Constants.GYROSCOPE);
-                break;
+                /*if(curTimestamp - previousTimeStamp > 30)
+                    updateAxis(Constants.GYROSCOPE, event.values);
+                break;*/
 
             case Sensor.TYPE_MAGNETIC_FIELD:
                 // Copy new magnetometer data into magnet array
                 System.arraycopy(event.values, 0, magnet, 0, 3);
-                updateAxis(Constants.MAGNETOMETER);
+//                updateAxis(Constants.MAGNETOMETER);
                 break;
         }
+
+//        previousTimeStamp = curTimestamp;
     }
 
 
@@ -177,7 +183,7 @@ public class FilterSensorData implements SensorEventListener {
     }
 
     // This function performs the integration of the gyroscope data.
-    // It writes the gyroscope based orientation into gyroOrientation.
+    // It writes the gyroscope based orientation into gyroOrientationX.
     private void gyroFunction(SensorEvent event) {
         // Don't start until first accelerometer/magnetometer orientation has been acquired
         if (accMagOrientation == null)
@@ -333,52 +339,61 @@ public class FilterSensorData implements SensorEventListener {
 
             // Update sensor output in GUI
             //mHandler.post(updateOreintationDisplayTask);
-            updateAxis(Constants.FUSEDORIENTATION);
+            updateAxis(Constants.FUSEDORIENTATION, fusedOrientation);
         }
     }
 
 
 
-    public void updateAxis(int val) {
+    public void updateAxis(int val,float [] data) {
 //        float [][] =
-
+        String result ="";
         switch (val){
             // This is must
             case Constants.GYROSCOPE:
-                ActivityPrediction.gyroX.add(gyroOrientation[0]);
-                ActivityPrediction.gyroY.add(gyroOrientation[1]);
-                ActivityPrediction.gyroZ.add(gyroOrientation[2]);
+                ActivityPrediction.gyroX.add(data[0]);
+                ActivityPrediction.gyroY.add(data[1]);
+                ActivityPrediction.gyroZ.add(data[2]);
+                ActivityPrediction.gyroOrientationX.add(gyroOrientation[0]);
+                ActivityPrediction.gyroOrientationY.add(gyroOrientation[1]);
+                ActivityPrediction.gyroOrientationZ.add(gyroOrientation[2]);
+                result = System.currentTimeMillis() + "," +  data[0] + "," + data[1] + "," + data[2] + "," + gyroOrientation[0] + "," + gyroOrientation[1] + "," + gyroOrientation[2];
+                if(MainActivity.fw!=null)
+                    MainActivity.fw.addValues(result, Constants.GYROSCOPE);
                 break;
             // This is must
             case Constants.ACCELEROMETER:
-                ActivityPrediction.accX.add(accel[0]);
-                ActivityPrediction.accY.add(accel[1]);
-                ActivityPrediction.accZ.add(accel[2]);
+                ActivityPrediction.accX.add(data[0]);
+                ActivityPrediction.accY.add(data[1]);
+                ActivityPrediction.accZ.add(data[2]);
+                result = System.currentTimeMillis() + "," +  data[0] + "," + data[1] + "," + data[2] ;
+                if(MainActivity.fw!=null)
+                    MainActivity.fw.addValues(result, Constants.ACCELEROMETER);
                 break;
             //Low Pass Filter
             case Constants.MAGNETOMETER:
-                ActivityPrediction.accMagOrientationX.add(accMagOrientation[0]);
-                ActivityPrediction.accMagOrientationY.add(accMagOrientation[1]);
-                ActivityPrediction.accMagOrientationZ.add(accMagOrientation[2]);
                 break;
             //High Pass Pass Filter
             case Constants.FUSEDORIENTATION:
-                ActivityPrediction.fusedOrientationX.add(fusedOrientation[0]);
-                ActivityPrediction.fusedOrientationY.add(fusedOrientation[1]);
-                ActivityPrediction.fusedOrientationZ.add(fusedOrientation[2]);
+                ActivityPrediction.fusedOrientationX.add(data[0]);
+                ActivityPrediction.fusedOrientationY.add(data[1]);
+                ActivityPrediction.fusedOrientationZ.add(data[2]);
+                result = System.currentTimeMillis() + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + magnet[0] + ","  + magnet[1] + ","  + magnet[2] + "," +  data[0] + "," + data[1] + "," + data[2] ;
+                if(MainActivity.fw!=null)
+                    MainActivity.fw.addValues(result, Constants.FUSEDORIENTATION);
                 break;
         }
-
-        /*float[] data = {gyroOrientation[0],gyroOrientation[1],gyroOrientation[2],accMagOrientation[0],
+        Log.d(TAG, "Data writter to csv : " + result);
+        /*float[] data = {gyroOrientationX[0],gyroOrientationX[1],gyroOrientationX[2],accMagOrientation[0],
                 accMagOrientation[1],accMagOrientation[2],fusedOrientation[0],fusedOrientation[1],fusedOrientation[2]};
 */
-        String data = System.currentTimeMillis() + "," + accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1] + "," + gyro[2] + "," +
-                magnet[0] + "," + magnet[1] + "," + magnet[2] + "," + gyroOrientation[0] + "," + gyroOrientation[1] + "," + gyroOrientation[2] +
+       /* String data = System.currentTimeMillis() + "," + accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1] + "," + gyro[2] + "," +
+                magnet[0] + "," + magnet[1] + "," + magnet[2] + "," + gyroOrientationX[0] + "," + gyroOrientationX[1] + "," + gyroOrientationX[2] +
                 "," + fusedOrientation[0] + "," + fusedOrientation[1] + "," + fusedOrientation[2];
-        Log.d(TAG, "Data writter to csv : " + data);
+
 
         if(MainActivity.fw!=null)
-            MainActivity.fw.addValues(data);
+            MainActivity.fw.addValues(data);*/
 
     }
 }

@@ -20,9 +20,9 @@ public class ActivityPrediction {
     public static Queue<Float> gyroX = new LinkedList<>();
     public static Queue<Float> gyroY = new LinkedList<>();
     public static Queue<Float> gyroZ = new LinkedList<>();
-    public static Queue<Float> accMagOrientationX = new LinkedList<>();
-    public static Queue<Float> accMagOrientationY = new LinkedList<>();
-    public static Queue<Float> accMagOrientationZ = new LinkedList<>();
+    public static Queue<Float> gyroOrientationX = new LinkedList<>();
+    public static Queue<Float> gyroOrientationY = new LinkedList<>();
+    public static Queue<Float> gyroOrientationZ = new LinkedList<>();
     public static Queue<Float> fusedOrientationX = new LinkedList<>();
     public static Queue<Float> fusedOrientationY = new LinkedList<>();
     public static Queue<Float> fusedOrientationZ = new LinkedList<>();

@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private static final String TAG = "MyActivity";
 
     public static Activity activity;
+    public static FileWrite fw =null;
 
     /*private static final int N_SAMPLES = 100;
     public static Queue<Float> ax;
@@ -44,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextView downstairsTextView;
     public static FilterSensorData mFilterSensorData = null;
 
-    public static FileWrite fw = null;
     public static String accValue = "";
     public static String gyroValue = "";
     public static String kalmanValue = "";
@@ -225,16 +225,29 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             if (!directory.exists()) {
                 directory.mkdirs();
             }
-            File csvFile = new File(directory, fileName);
-            FileWriter writer = new FileWriter(csvFile);
+            /*File csvFileAccel = new File(directory, "acc_" + fileName );
+            FileWriter writerAccel = new FileWriter(csvFileAccel);
+            File csvFileGyro = new File(directory, "gyro_" + fileName);
+            FileWriter writerGyro = new FileWriter(csvFileGyro);*/
+            File csvFileFused = new File(directory,"fused_" +  fileName);
+            FileWriter writerFused = new FileWriter(csvFileFused);
 
-            writer.append("time,ax,ay,az,gx,gy,gz,mx,my,mz,gox,goy,goz,fox,foy,foz\n");
-            writer.flush();
 
-            fw.setFile(csvFile);
-            fw.setCsvFile(csvFile);
-            fw.setFileName(fileName);
-            fw.setWriter(writer);
+
+          /*  writerAccel.append("time,ax,ay,az\n");
+            writerAccel.flush();
+            writerGyro.append("time,gx,gy,gz,gox,goy,goz\n");
+            writerGyro.flush();*/
+            writerFused.append("time,ax,ay,az,gx,gy,gz,mx,my,mz,fox,foy,foz\n");
+            writerFused.flush();
+
+            FileWriter fwArray [] = {null,null,writerFused};
+            File fileArray [] = {null,null,csvFileFused};
+
+//            fw.setFile(fwArray);
+            fw.setCsvFile(fileArray);
+//            fw.setFileName(fileName);
+            fw.setWriterArray(fwArray);
 
             return true;
         } catch (FileNotFoundException e) {
@@ -248,8 +261,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     public void endSession() {
         try {
-            fw.getWriter().flush();
-            fw.getWriter().close();
+
+            fw.closeFileWriter();
 
             Log.d(TAG, "Session over. ");
             Toast.makeText(this, "Sending data to phone!", Toast.LENGTH_SHORT).show();
