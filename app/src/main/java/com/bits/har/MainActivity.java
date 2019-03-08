@@ -10,13 +10,18 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+public class MainActivity extends BaseActivity implements TextToSpeech.OnInitListener {
     private static final String TAG = "MyActivity";
 
     public static Activity activity;
@@ -32,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextView downstairsTextView;
     public static FilterSensorData mFilterSensorData = null;
 
-
+    public static FileWrite fw = null;
     public static String accValue = "";
     public static String gyroValue = "";
     public static String kalmanValue = "";
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public float[] results;
     private String previousResult;
     private TensorFlowClassifier classifier;
+    public static SharedPreferences preferences = null;
 
     private String[] labels = {"Jogging", "Standing","Walking"};
 //    private String[] labels = {"Downstairs", "Jogging", "Sitting", "Standing", "Upstairs", "Walking"};
@@ -82,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         gy = new LinkedList<>();
         gz = new LinkedList<>();*/
 
+        startSession();
         setSensorManager(getApplicationContext());
 
 //        downstairsTextView = (TextView) findViewById(R.id.downstairs_prob);
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         SensorManager mSensorManger = (SensorManager) getSystemService(SENSOR_SERVICE);
         mFilterSensorData = new FilterSensorData(getApplicationContext(),mSensorManger);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this); // Create SharedPreferences instance
+        preferences = PreferenceManager.getDefaultSharedPreferences(this); // Create SharedPreferences instance
         String filterCoefficient = preferences.getString("filterCoefficient", null); // Read the stored value for filter coefficient
         if (filterCoefficient != null) {
             mFilterSensorData.filter_coefficient = Float.parseFloat(filterCoefficient);
@@ -119,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onInit(int status) {
+        startSession();
         /*Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -176,6 +184,54 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onDestroy() {
         super.onDestroy();
         mFilterSensorData.unregisterListeners();
+        endSession();
+    }
+
+    public boolean startSession() {
+        fw = new FileWrite();
+        String fileName = FileWrite.getFileName();
+        if (!checkPermissions()) return false;
+        try {
+
+            String filepath = Environment.getExternalStorageDirectory() + "/track/";
+            File directory = new File(filepath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            File csvFile = new File(directory, fileName);
+            FileWriter writer = new FileWriter(csvFile);
+
+            writer.append("time,ax,ay,az,gx,gy,gz,mx,my,mz,gox,goy,goz,fox,foy,foz\n");
+            writer.flush();
+
+            fw.setFile(csvFile);
+            fw.setCsvFile(csvFile);
+            fw.setFileName(fileName);
+            fw.setWriter(writer);
+
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    public void endSession() {
+        try {
+            fw.getWriter().flush();
+            fw.getWriter().close();
+
+            Log.d(TAG, "Session over. ");
+            Toast.makeText(this, "Sending data to phone!", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Session ending error. Writer issue? or csvFile missing?");
+            fw = null;
+            startSession();
+        }
     }
 
     public static int getRotation() {
