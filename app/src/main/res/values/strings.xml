@@ -8,4 +8,5 @@
     <string name="standing">Standing</string>
     <string name="upstairs">Upstairs</string>
     <string name="walking">Walking</string>
+    <string name="record">Record</string>
 </resources>

@@ -4,13 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,9 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements TextToSpeech.OnInitListener {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     private static final String TAG = "MyActivity";
 
     public static Activity activity;
@@ -63,6 +70,7 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
     private TextView standingTextView;
 //    private TextView upstairsTextView;
     private TextView walkingTextView;
+    private Switch recordingSwitchtView;
     private TextToSpeech textToSpeech;
 
     public float[] results;
@@ -88,8 +96,7 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         gy = new LinkedList<>();
         gz = new LinkedList<>();*/
 
-        startSession();
-        setSensorManager(getApplicationContext());
+//        startSession();
 
 //        downstairsTextView = (TextView) findViewById(R.id.downstairs_prob);
         joggingTextView = (TextView) findViewById(R.id.jogging_prob);
@@ -97,12 +104,32 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         standingTextView = (TextView) findViewById(R.id.standing_prob);
 //        upstairsTextView = (TextView) findViewById(R.id.upstairs_prob);
         walkingTextView = (TextView) findViewById(R.id.walking_prob);
+        recordingSwitchtView = (Switch) findViewById(R.id.record_data);
+
+        recordingSwitchtView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // do something, the isChecked will be
+                // true if the switch is in the On position
+                if(isChecked){
+                    Toast.makeText(activity, "Recording Data!", Toast.LENGTH_SHORT)
+                            .show();
+                    startSession();
+                }else {
+                    Toast.makeText(activity, "Saving Data...", Toast.LENGTH_SHORT)
+                            .show();
+                    endSession();
+                }
+
+            }
+        });
+
 
         classifier = new TensorFlowClassifier(getApplicationContext());
 
         /*textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
         previousResult = "";*/
+        setSensorManager(this);
     }
 
     private void setSensorManager(Context applicationContext) {
@@ -126,7 +153,7 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
 
     @Override
     public void onInit(int status) {
-        startSession();
+//        startSession();
         /*Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -230,7 +257,6 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
             e.printStackTrace();
             Log.e(TAG, "Session ending error. Writer issue? or csvFile missing?");
             fw = null;
-            startSession();
         }
     }
 
@@ -241,7 +267,8 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
     private void setTextToSpeech() {
             joggingTextView.setText(Float.toString(round(results[0], 2)));
             standingTextView.setText(Float.toString(round(results[1], 2)));
-            walkingTextView.setText(Float.toString(round(results[2], 2)));    }
+            walkingTextView.setText(Float.toString(round(results[2], 2)));
+    }
 
     private float[] toFloatArray(List<Float> list) {
         int i = 0;
@@ -253,10 +280,42 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         return array;
     }
 
+    public boolean checkPermissions() {
+        int result;
+        final List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : Constants.PERMISSIONS) {
+            result = ContextCompat.checkSelfPermission(this, p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat
+                    .requestPermissions(this,
+                            listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
+                            100);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private static float round(float d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
     }
 
+    @Override
+    public void onRequestPermissionsResult(final int requestCode,
+                                           @NonNull final String permissions[],
+                                           @NonNull final int[] grantResults) {
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // do something
+                Toast.makeText(this, "Permissions granted! Press Start!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    }
 }

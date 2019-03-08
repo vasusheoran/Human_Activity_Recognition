@@ -161,5 +161,44 @@
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ededed"
+            android:padding="22dp"
+            tools:context=".MainActivity">
+
+
+
+            <TableRow
+                android:id="@+id/record"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:padding="22dp">
+
+                <!-- <TextView
+                     android:id="@+id/recording_title"
+                     android:layout_weight="1"
+                     android:text="@string/record"
+                     android:textAlignment="center"
+                     android:textSize="18sp"
+                     android:textStyle="bold" />-->
+                <!--<TextView
+                    android:id="@+id/walking_prob"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />-->
+                <Switch
+                    android:id="@+id/record_data"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Record Data"
+                    android:textSize="18sp"
+                    android:textStyle="bold"  />
+            </TableRow>
+        </TableLayout>
     </TableLayout>
+
+
 </ScrollView>

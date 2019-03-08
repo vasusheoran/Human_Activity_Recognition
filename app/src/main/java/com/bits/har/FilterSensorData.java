@@ -376,7 +376,9 @@ public class FilterSensorData implements SensorEventListener {
                 magnet[0] + "," + magnet[1] + "," + magnet[2] + "," + gyroOrientation[0] + "," + gyroOrientation[1] + "," + gyroOrientation[2] +
                 "," + fusedOrientation[0] + "," + fusedOrientation[1] + "," + fusedOrientation[2];
         Log.d(TAG, "Data writter to csv : " + data);
-        MainActivity.fw.addValues(data);
+
+        if(MainActivity.fw!=null)
+            MainActivity.fw.addValues(data);
 
     }
 }
