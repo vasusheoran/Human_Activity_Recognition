@@ -40,8 +40,8 @@ public class FileWrite extends BaseActivity {
         FileWrite.fileName = fileName;
     }
 
-    private FileWriter writerArray[] = new FileWriter[3];
-    private File csvFile []= new File[3];
+    private static FileWriter writerArray[] = new FileWriter[3];
+    private static File csvFile []= new File[3];
     private static String fileName[] = new String[3];
 
     public File getFile() {
@@ -51,7 +51,7 @@ public class FileWrite extends BaseActivity {
     public void setFile(File file) {
         this.file = file;
     }
-
+/*
     public static void writeToTextFile(String data, Context context) {
         try {
             File folder = new File(Environment.getExternalStorageDirectory()
@@ -68,15 +68,14 @@ public class FileWrite extends BaseActivity {
             PrintWriter p = new PrintWriter(new FileOutputStream(file, true));
             p.println("Hello");
 
-            /*OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
+            *//*OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
-            outputStreamWriter.close();*/
+            outputStreamWriter.close();*//*
         }
         catch (IOException e) {
             Log.e(TAG, "File write failed: " + e.toString());
         }
-    }
-
+    }*/
 
     public static String getFileName() {
         final Calendar date = Calendar.getInstance();
@@ -110,7 +109,7 @@ public class FileWrite extends BaseActivity {
 
         return sb.toString();
     }
-
+/*
     public void writeData(String data,String strFilePath)
     {
 
@@ -138,7 +137,9 @@ public class FileWrite extends BaseActivity {
         {
             e.printStackTrace();
         }
-    }
+    }*/
+
+/*
     public static String readFromFile(Context context) {
 
         String ret = "";
@@ -166,7 +167,7 @@ public class FileWrite extends BaseActivity {
         }
 
         return ret;
-    }
+    }*/
     public void addValues(String data,int value) {
         try {
             switch (value){

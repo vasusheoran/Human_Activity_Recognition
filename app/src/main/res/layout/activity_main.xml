@@ -56,7 +56,7 @@
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>-->
-
+<!--
         <TableRow
             android:id="@+id/jogging_row"
             android:layout_width="fill_parent"
@@ -76,7 +76,7 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
-        </TableRow>
+        </TableRow>-->
 <!--
         <TableRow
             android:id="@+id/sitting_row"
@@ -106,15 +106,15 @@
             android:padding="22dp">
 
             <TextView
-                android:id="@+id/standing_title"
+                android:id="@+id/walking_title_slow"
                 android:layout_weight="1"
-                android:text="@string/standing"
+                android:text="@string/walking_slow"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/standing_prob"
+                android:id="@+id/walking_prob_slow"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -148,15 +148,15 @@
             android:padding="22dp">
 
             <TextView
-                android:id="@+id/walking_title"
+                android:id="@+id/walking_title_fast"
                 android:layout_weight="1"
-                android:text="@string/walking"
+                android:text="@string/walking_fast"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/walking_prob"
+                android:id="@+id/walking_prob_fast"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -177,18 +177,6 @@
                 android:layout_height="fill_parent"
                 android:padding="22dp">
 
-                <!-- <TextView
-                     android:id="@+id/recording_title"
-                     android:layout_weight="1"
-                     android:text="@string/record"
-                     android:textAlignment="center"
-                     android:textSize="18sp"
-                     android:textStyle="bold" />-->
-                <!--<TextView
-                    android:id="@+id/walking_prob"
-                    android:layout_weight="1"
-                    android:textAlignment="center"
-                    android:textSize="18sp" />-->
                 <Switch
                     android:id="@+id/record_data"
                     android:layout_weight="1"
@@ -197,6 +185,22 @@
                     android:textSize="18sp"
                     android:textStyle="bold"  />
             </TableRow>
+
+            <TableRow
+                android:id="@+id/predict"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:padding="22dp">
+
+                <Switch
+                    android:id="@+id/enable_voice"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Enable Voice"
+                    android:textSize="18sp"
+                    android:textStyle="bold"  />
+            </TableRow>
+
         </TableLayout>
     </TableLayout>
 
