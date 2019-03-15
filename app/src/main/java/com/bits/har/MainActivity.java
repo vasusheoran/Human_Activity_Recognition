@@ -110,14 +110,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private void setSensorManager() {
 
         SensorManager mSensorManger = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mFilterSensorData = new FilterSensorData(mSensorManger, activityPrediction, this ,fw);
+        mFilterSensorData = new FilterSensorData(mSensorManger, activityPrediction);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this); // Create SharedPreferences instance
         String filterCoefficient = preferences.getString("filterCoefficient", null); // Read the stored value for filter coefficient
-        if (filterCoefficient != null) {
+       /* if (filterCoefficient != null) {
             mFilterSensorData.setFilter_coefficient(Float.parseFloat(filterCoefficient));
             mFilterSensorData.setTempFilter_coefficient(mFilterSensorData.getFilter_coefficient());
-        }
+        }*/
 
         backToSpot = preferences.getBoolean("backToSpot", true); // Back to spot is true by default
         maxAngle = preferences.getInt("maxAngle", 8); // Eight is the default value
@@ -177,10 +177,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onStop() {
         super.onStop();
 
-        mFilterSensorData.unregisterListeners();
+//        mFilterSensorData.unregisterListeners();
 
         SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        edit.putString("filterCoefficient", Float.toString(mFilterSensorData.getFilter_coefficient()));
+//        edit.putString("filterCoefficient", Float.toString(mFilterSensorData.getFilter_coefficient()));
         edit.putBoolean("backToSpot", backToSpot);
         edit.putInt("maxAngle", maxAngle);
         edit.putInt("maxTurning", maxTurning);

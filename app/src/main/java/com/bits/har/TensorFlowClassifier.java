@@ -4,8 +4,6 @@ import android.content.Context;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
-import java.util.List;
-
 
 class TensorFlowClassifier {
     static {
