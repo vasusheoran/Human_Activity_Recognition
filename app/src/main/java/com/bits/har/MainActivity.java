@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public static int maxAngle = 8; // Eight is the default value
     public static int maxTurning = 20; // Twenty is the default value
     ActivityPrediction activityPrediction;
+    private static final int TIME_CONSTANT = 2000;
+    private final int N_SAMPLES = Constants.N_SAMPLES;
 
     public TextView walkingSlowTextView;
     public TextView walkingFastTextView;
@@ -87,13 +89,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         predictActivitySwitchtView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    Toast.makeText(activity, "Predicting Activity", Toast.LENGTH_SHORT)
+                    Toast.makeText(activity, "Voice Enabled", Toast.LENGTH_SHORT)
                             .show();
-                    isVoiceEnabled = false;
+                    isVoiceEnabled = true;
+                    new Timer().scheduleAtFixedRate(new updateActivity(), 2000, 3000);
                 }else {
                     Toast.makeText(activity, "...", Toast.LENGTH_SHORT)
                             .show();
-                    isVoiceEnabled = true;
+                    isVoiceEnabled = false;
                 }
 
             }
@@ -119,22 +122,27 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         backToSpot = preferences.getBoolean("backToSpot", true); // Back to spot is true by default
         maxAngle = preferences.getInt("maxAngle", 8); // Eight is the default value
         maxTurning = preferences.getInt("maxTurning", 20); // Twenty is the default value
+
+        //Start Predictions
+
+        new Timer().scheduleAtFixedRate(new CalculateProbabilty(), 1000, TIME_CONSTANT);
     }
 
 
     @Override
     public void onInit(int status) {
 //        startTimerThread();
-        new Timer().scheduleAtFixedRate(new updateActivity(), 2000, 2000);
     }
 
     public class updateActivity extends TimerTask {
 
         public void run(){
 
-            int trainDataSize = 1620;
-            if(trainData!=null && trainData.size() == trainDataSize)
-                results = ActivityPrediction.classifier.predictProbabilities(toFloatArray(trainData));
+
+            if(!isVoiceEnabled){
+                this.cancel();
+                return;
+            }
 
             if(results == null)
                 return;
@@ -147,19 +155,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 }
             }
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    setActivityPrediction();
-                }
-            });
-
-            Log.v(TAG, "Results : " + results[0] + " , " + results[1]);
-
-            if(isVoiceEnabled)
                 textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+        }
     }
-    }
+
+
 
     @Override
     protected void onPause() {
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
-    public void setActivityPrediction() {
+    public void setPrediction() {
         if(results == null)
             return;
         walkingFastTextView.setText(Float.toString(round(results[0], 2)));
@@ -295,4 +295,37 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         }
     }
+
+
+    class CalculateProbabilty extends TimerTask {
+        public void run() {
+            if(ActivityPrediction.accX.size() < N_SAMPLES)
+                return;
+
+                List<Float> data = new ArrayList<>();
+                ActivityPrediction.isPredicting = true;
+                data.addAll(ActivityPrediction.accX);
+                data.addAll(ActivityPrediction.accY);
+                data.addAll(ActivityPrediction.accZ);
+                data.addAll(ActivityPrediction.gyroX);
+                data.addAll(ActivityPrediction.gyroY);
+                data.addAll(ActivityPrediction.gyroZ);
+                data.addAll(ActivityPrediction.fusedOrientationX);
+                data.addAll(ActivityPrediction.fusedOrientationY);
+                data.addAll(ActivityPrediction.fusedOrientationZ);
+                ActivityPrediction.isPredicting = false;
+                if(data.size() == Constants.BATCH_SIZE){
+                    results = activityPrediction.classifier.predictProbabilities(toFloatArray(data));
+                    Log.d(TAG, "Results : " + results[0] + " , " +  results[1]);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setPrediction();
+                        }
+                    });
+                    Log.d(TAG, "Updating UI ");
+                }
+        }
+    }
+
 }

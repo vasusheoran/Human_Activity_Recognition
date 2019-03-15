@@ -15,8 +15,9 @@ import java.util.TimerTask;
 
 public class ActivityPrediction{
 
+    public static boolean isPredicting;
     private  final String TAG = "ActivityPrediction";
-    private final int N_SAMPLES = 180;
+    private final int N_SAMPLES = Constants.N_SAMPLES;
     public  static Queue<Float> accX = new LinkedList<>();
     public  static Queue<Float> accY = new LinkedList<>();
     public  static Queue<Float> accZ = new LinkedList<>();
@@ -33,14 +34,36 @@ public class ActivityPrediction{
 
 
     private String previousResult;
-    public static TensorFlowClassifier classifier;
+    public TensorFlowClassifier classifier;
 
 
     public  void updateSensorValues(float[] accel, float[] gyro, float[] fusedOrientation){
-        if(accX.size() >= N_SAMPLES &&  accY.size() >= N_SAMPLES &&  accZ.size() >= N_SAMPLES &&  gyroX.size() >= N_SAMPLES &&  gyroY.size() >= N_SAMPLES &&  gyroZ.size() >= N_SAMPLES &&  fusedOrientationX.size() >= N_SAMPLES
-                &&  fusedOrientationY.size() >= N_SAMPLES &&  fusedOrientationZ.size() >= N_SAMPLES   ) {
+        if(isPredicting)
+            return ;
+        if(accX.size() >= N_SAMPLES ){
+            accX.remove();
+            accY.remove();
+            accZ.remove();
+        }
+        /*if(accY.size() >= N_SAMPLES ){}
+        if (accZ.size() >= N_SAMPLES ) {}*/
+        if(gyroX.size() >= N_SAMPLES){
+            gyroX.remove();
+            gyroY.remove();
+            gyroZ.remove();
+        }
+       /* if( gyroY.size() >= N_SAMPLES) {}
+        if( gyroZ.size() >= N_SAMPLES ){}*/
+        if(fusedOrientationX.size() >= N_SAMPLES){
 
-            List<Float> data = new ArrayList<>();
+            fusedOrientationX.remove();
+            fusedOrientationY.remove();
+            fusedOrientationZ.remove();
+        }
+        /*if(fusedOrientationY.size() >= N_SAMPLES) {}
+        if(fusedOrientationZ.size() >= N_SAMPLES) {
+        }*/
+           /* List<Float> data = new ArrayList<>();
             data.addAll(accX);
             data.addAll(accY);
             data.addAll(accZ);
@@ -50,17 +73,7 @@ public class ActivityPrediction{
             data.addAll(fusedOrientationX);
             data.addAll(fusedOrientationY);
             data.addAll(fusedOrientationZ);
-            MainActivity.trainData = data;
-            accX.remove();
-            accY.remove();
-            accZ.remove();
-            gyroX.remove();
-            gyroY.remove();
-            gyroZ.remove();
-            fusedOrientationX.remove();
-            fusedOrientationY.remove();
-            fusedOrientationZ.remove();
-        }
+            MainActivity.trainData = data;*/
 
 //        size +=9;
         accX.add(accel[0]);
@@ -96,30 +109,5 @@ public class ActivityPrediction{
         }
         return array;
     }
-/*
 
-    class CalculateProbabilty extends TimerTask {
-        public void run() {
-
-            float [] res = new float[2];
-            List<Float> data = new ArrayList<>();
-            data.addAll(accX);
-            data.addAll(accY);
-            data.addAll(accZ);
-            data.addAll(gyroX);
-            data.addAll(gyroY);
-            data.addAll(gyroZ);
-            data.addAll(fusedOrientationX);
-            data.addAll(fusedOrientationY);
-            data.addAll(fusedOrientationZ);
-            if(data.size() == N_SAMPLES * 9){
-                res  = classifier.predictProbabilities(toFloatArray(data));
-//                MainActivity.setTextToSpeech(res);
-
-//                walkingFastTextView.setText(Float.toString(round(res[0], 2)));
-//                walkingSlowTextView.setText(Float.toString(round(res[1], 2)));
-                Log.v(TAG, "Results : " + res[0] + " , " +  res[1]);
-            }
-        }
-    }*/
 }

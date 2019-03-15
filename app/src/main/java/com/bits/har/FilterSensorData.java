@@ -52,7 +52,7 @@ public class FilterSensorData implements SensorEventListener {
     private long previousTimeStamp = 0l;
     private boolean initState = true;
 
-    private static final int TIME_CONSTANT = 1;
+    private static final int TIME_CONSTANT = 30;
     private float filter_coefficient = 0.90f;
     private float tempFilter_coefficient = filter_coefficient;
     protected DecimalFormat d = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ENGLISH);
