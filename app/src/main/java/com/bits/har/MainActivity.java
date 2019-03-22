@@ -1,184 +1,251 @@
 package com.bits.har;
 
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
-
-    private static final int N_SAMPLES = 100;
-    private static Queue<Float> ax;
-    private static Queue<Float> ay;
-    private static Queue<Float> az;
-    private static Queue<Float> gx;
-    private static Queue<Float> gy;
-    private static Queue<Float> gz;
-    private TextView downstairsTextView;
-
-    private TextView joggingTextView;
-    private TextView sittingTextView;
-    private TextView standingTextView;
-    private TextView upstairsTextView;
-    private TextView walkingTextView;
-    private TextToSpeech textToSpeech;
-    private float[] results;
-    private String previousResult;
-    private TensorFlowClassifier classifier;
-
-    private String[] labels = {"Jogging", "Standing","Walking"};
-//    private String[] labels = {"Downstairs", "Jogging", "Sitting", "Standing", "Upstairs", "Walking"};
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     private static final String TAG = "MyActivity";
+
+    public Activity activity;
+    public static FileWrite fw =null;
+    protected static List<Float> trainData;
+
+    public FilterSensorData mFilterSensorData;
+
+    public static boolean backToSpot;
+    public static int maxAngle = 8; // Eight is the default value
+    public static int maxTurning = 20; // Twenty is the default value
+    ActivityPrediction activityPrediction;
+    private static final int TIME_CONSTANT = 2000;
+    private final int N_SAMPLES = Constants.N_SAMPLES;
+
+    public TextView walkingSlowTextView;
+    public TextView walkingFastTextView;
+    private TextToSpeech textToSpeech;
+    public static boolean isVoiceEnabled;
+
+    public static float[] results;
+    public static SharedPreferences preferences = null;
+
+    private String[] labels = {"Fast", "Slow","Walking"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set portrait mode only - for small screens like phones
         setContentView(R.layout.activity_main);
-        ax = new LinkedList<>();
-        ay = new LinkedList<>();
-        az = new LinkedList<>();
-        gx = new LinkedList<>();
-        gy = new LinkedList<>();
-        gz = new LinkedList<>();
+        activityPrediction = new ActivityPrediction(this);
 
-//        downstairsTextView = (TextView) findViewById(R.id.downstairs_prob);
-        joggingTextView = (TextView) findViewById(R.id.jogging_prob);
-//        sittingTextView = (TextView) findViewById(R.id.sitting_prob);
-        standingTextView = (TextView) findViewById(R.id.standing_prob);
-//        upstairsTextView = (TextView) findViewById(R.id.upstairs_prob);
-        walkingTextView = (TextView) findViewById(R.id.walking_prob);
+        walkingSlowTextView = findViewById(R.id.walking_prob_slow);
+        walkingFastTextView = findViewById(R.id.walking_prob_fast);
+        Switch recordingSwitchtView = findViewById(R.id.record_data);
+        Switch predictActivitySwitchtView = findViewById(R.id.enable_voice);
 
-        classifier = new TensorFlowClassifier(getApplicationContext());
+        recordingSwitchtView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    Toast.makeText(activity, "Recording Data!", Toast.LENGTH_SHORT)
+                            .show();
+                    startSession();
+                }else {
+                    Toast.makeText(activity, "Saving Data...", Toast.LENGTH_SHORT)
+                            .show();
+                    endSession();
+                }
+
+            }
+        });
+
+        predictActivitySwitchtView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    Toast.makeText(activity, "Voice Enabled", Toast.LENGTH_SHORT)
+                            .show();
+                    isVoiceEnabled = true;
+                    new Timer().scheduleAtFixedRate(new updateActivity(), 2000, 3000);
+                }else {
+                    Toast.makeText(activity, "...", Toast.LENGTH_SHORT)
+                            .show();
+                    isVoiceEnabled = false;
+                }
+
+            }
+        });
 
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
-        previousResult = "";
+        setSensorManager();
     }
+
+    private void setSensorManager() {
+
+        SensorManager mSensorManger = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mFilterSensorData = new FilterSensorData(mSensorManger, activityPrediction);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this); // Create SharedPreferences instance
+        String filterCoefficient = preferences.getString("filterCoefficient", null); // Read the stored value for filter coefficient
+       /* if (filterCoefficient != null) {
+            mFilterSensorData.setFilter_coefficient(Float.parseFloat(filterCoefficient));
+            mFilterSensorData.setTempFilter_coefficient(mFilterSensorData.getFilter_coefficient());
+        }*/
+
+        backToSpot = preferences.getBoolean("backToSpot", true); // Back to spot is true by default
+        maxAngle = preferences.getInt("maxAngle", 8); // Eight is the default value
+        maxTurning = preferences.getInt("maxTurning", 20); // Twenty is the default value
+
+        //Start Predictions
+
+        new Timer().scheduleAtFixedRate(new CalculateProbabilty(), 1000, TIME_CONSTANT);
+    }
+
 
     @Override
     public void onInit(int status) {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (results == null || results.length == 0) {
-                    return;
-                }
-                float max = -1;
-                int idx = -1;
-                for (int i = 0; i < results.length; i++) {
-                    if (results[i] > max) {
-                        idx = i;
-                        max = results[i];
-                    }
-                }
+//        startTimerThread();
+    }
 
-                //if(previousResult!=labels[idx]){
-                    textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
-                    previousResult = labels[idx];
-                    Log.v(TAG, "Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
-                /*}else{
-                    Log.v(TAG, "Activity Unchanged");
-                }*/
+    public class updateActivity extends TimerTask {
+
+        public void run(){
+
+
+            if(!isVoiceEnabled){
+                this.cancel();
+                return;
             }
-        }, 2000, 5000);
+
+            if(results == null)
+                return;
+            float max = -1;
+            int idx = -1;
+            for (int i = 0; i < results.length; i++) {
+                if (results[i] > max) {
+                    idx = i;
+                    max = results[i];
+                }
+            }
+
+                textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+        }
     }
 
+
+
+    @Override
     protected void onPause() {
-        getSensorManager().unregisterListener(this);
         super.onPause();
+//        mFilterSensorData.unregisterListeners();
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+        mFilterSensorData.initListeners();
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        activityPrediction();
-        final int type = event.sensor.getType();
-        if (type == Sensor.TYPE_ACCELEROMETER) {
-            //Smoothing the sensor data a bit
-            ax.add(event.values[0]);
-            ay.add(event.values[1]);
-            az.add(event.values[2]);
+    protected void onStop() {
+        super.onStop();
 
-        }
-        if (type == Sensor.TYPE_GYROSCOPE) {
-            //Smoothing the sensor data a bit
-            gx.add(event.values[0]);
-            gy.add(event.values[1]);
-            gz.add(event.values[2]);
-        }
+//        mFilterSensorData.unregisterListeners();
 
+        SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
+//        edit.putString("filterCoefficient", Float.toString(mFilterSensorData.getFilter_coefficient()));
+        edit.putBoolean("backToSpot", backToSpot);
+        edit.putInt("maxAngle", maxAngle);
+        edit.putInt("maxTurning", maxTurning);
+        edit.apply();
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
+    protected void onDestroy() {
+        super.onDestroy();
+        mFilterSensorData.unregisterListeners();
+        endSession();
     }
 
-    private void activityPrediction() {
-//
-        if (ax.size() >= N_SAMPLES && ay.size() >= N_SAMPLES && az.size() >= N_SAMPLES && gx.size() >= N_SAMPLES && gy.size() >= N_SAMPLES && gz.size() >= N_SAMPLES) {
+    public void startSession() {
+        fw = new FileWrite();
+        String fileName = FileWrite.getFileName();
+        if (!checkPermissions()) return;
+        try {
 
-//            Log.v(TAG, "Inside Activity Prediction : ax - " + ax.size() + " | gxsize - " + gx.size());
-            List<Float> data = new ArrayList<>();
-            data.addAll(ax);
-            data.addAll(ay);
-            data.addAll(az);
-            data.addAll(gx);
-            data.addAll(gy);
-            data.addAll(gz);
+            String filepath = Environment.getExternalStorageDirectory() + "/track/";
+            File directory = new File(filepath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            File csvFileFused = new File(directory,"fused_" +  fileName);
+            FileWriter writerFused = new FileWriter(csvFileFused);
+            writerFused.append("time,ax,ay,az,gx,gy,gz,la_x,la_y,la_z,fox,foy,foz\n");
+            writerFused.flush();
 
-            results = classifier.predictProbabilities(toFloatArray(data));
-            //Log.v(TAG, results.toString());
-/*
-            downstairsTextView.setText(Float.toString(round(results[0], 2)));
-            joggingTextView.setText(Float.toString(round(results[1], 2)));
-            sittingTextView.setText(Float.toString(round(results[2], 2)));
-            standingTextView.setText(Float.toString(round(results[3], 2)));
-            upstairsTextView.setText(Float.toString(round(results[4], 2)));
-            walkingTextView.setText(Float.toString(round(results[5], 2)));
-            */
+            FileWriter fwArray [] = {null,null,writerFused};
+            File fileArray [] = {null,null,csvFileFused};
 
-            joggingTextView.setText(Float.toString(round(results[0], 2)));
-            standingTextView.setText(Float.toString(round(results[1], 2)));
-            walkingTextView.setText(Float.toString(round(results[2], 2)));
+            fw.setCsvFile(fileArray);
+            fw.setWriterArray(fwArray);
 
-            ax.clear();
-            ay.clear();
-            az.clear();
-            gx.clear();
-            gy.clear();
-            gz.clear();
+            return;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        if(ax.size() == 101){
-            ax.remove();
-            ay.remove();
-            az.remove();
+        return;
+    }
+
+
+    public void endSession() {
+        try {
+
+            if(fw!=null)
+                fw.closeFileWriter();
+
+            Log.d(TAG, "Session over. ");
+            Toast.makeText(this, "Sending data to phone!", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Session ending error. Writer issue? or csvFile missing?");
+            fw = null;
         }
-        if(gx.size() == 101){
-            gx.remove();
-            gy.remove();
-            gz.remove();
-        }
+    }
+
+    public void setPrediction() {
+        if(results == null)
+            return;
+        walkingFastTextView.setText(Float.toString(round(results[0], 2)));
+        walkingSlowTextView.setText(Float.toString(round(results[1], 2)));
     }
 
     private float[] toFloatArray(List<Float> list) {
@@ -191,14 +258,74 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return array;
     }
 
+    public boolean checkPermissions() {
+        int result;
+        final List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : Constants.PERMISSIONS) {
+            result = ContextCompat.checkSelfPermission(this, p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat
+                    .requestPermissions(this,
+                            listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
+                            100);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private static float round(float d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
     }
 
-    private SensorManager getSensorManager() {
-        return (SensorManager) getSystemService(SENSOR_SERVICE);
+    @Override
+    public void onRequestPermissionsResult(final int requestCode,
+                                           @NonNull final String permissions[],
+                                           @NonNull final int[] grantResults) {
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissions granted! Press Start!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    }
+
+
+    class CalculateProbabilty extends TimerTask {
+        public void run() {
+            if(ActivityPrediction.accX.size() < N_SAMPLES)
+                return;
+
+                List<Float> data = new ArrayList<>();
+                ActivityPrediction.isPredicting = true;
+                data.addAll(ActivityPrediction.accX);
+                data.addAll(ActivityPrediction.accY);
+                data.addAll(ActivityPrediction.accZ);
+//                data.addAll(ActivityPrediction.gyroX);
+//                data.addAll(ActivityPrediction.gyroY);
+//                data.addAll(ActivityPrediction.gyroZ);
+                data.addAll(ActivityPrediction.fusedOrientationX);
+                data.addAll(ActivityPrediction.fusedOrientationY);
+                data.addAll(ActivityPrediction.fusedOrientationZ);
+                ActivityPrediction.isPredicting = false;
+                if(data.size() == Constants.BATCH_SIZE){
+                    results = activityPrediction.classifier.predictProbabilities(toFloatArray(data));
+                    Log.d(TAG, "Results : " + results[0] + " , " +  results[1]);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setPrediction();
+                        }
+                    });
+                    Log.d(TAG, "Updating UI ");
+                }
+        }
     }
 
 }
