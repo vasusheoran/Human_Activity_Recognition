@@ -11,11 +11,11 @@ class TensorFlowClassifier {
     }
 
     private TensorFlowInferenceInterface inferenceInterface;
-    private static final String MODEL_FILE = "file:///android_asset/v5-1.pb";
-    private static final String INPUT_NODE = "conv2d_4_input";
-    private static final String[] OUTPUT_NODES = {"dense_12/Softmax"};
-    private static final String OUTPUT_NODE = "dense_12/Softmax";
-    private static final long[] INPUT_SIZE = {1, 180, 9, 1};
+    private static final String MODEL_FILE = "file:///android_asset/frozen_v3_har.pb";
+    private static final String INPUT_NODE = "input";
+    private static final String[] OUTPUT_NODES = {"y_"};
+    private static final String OUTPUT_NODE = "y_";
+    private static final long[] INPUT_SIZE = {1, 200, 6};
     private static final int OUTPUT_SIZE = 2;
 
     TensorFlowClassifier(final Context context) {

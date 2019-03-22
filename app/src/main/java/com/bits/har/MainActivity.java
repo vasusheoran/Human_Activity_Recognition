@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
             File csvFileFused = new File(directory,"fused_" +  fileName);
             FileWriter writerFused = new FileWriter(csvFileFused);
-            writerFused.append("time,ax,ay,az,gx,gy,gz,mx,my,mz,fox,foy,foz\n");
+            writerFused.append("time,ax,ay,az,gx,gy,gz,la_x,la_y,la_z,fox,foy,foz\n");
             writerFused.flush();
 
             FileWriter fwArray [] = {null,null,writerFused};
@@ -307,9 +307,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 data.addAll(ActivityPrediction.accX);
                 data.addAll(ActivityPrediction.accY);
                 data.addAll(ActivityPrediction.accZ);
-                data.addAll(ActivityPrediction.gyroX);
-                data.addAll(ActivityPrediction.gyroY);
-                data.addAll(ActivityPrediction.gyroZ);
+//                data.addAll(ActivityPrediction.gyroX);
+//                data.addAll(ActivityPrediction.gyroY);
+//                data.addAll(ActivityPrediction.gyroZ);
                 data.addAll(ActivityPrediction.fusedOrientationX);
                 data.addAll(ActivityPrediction.fusedOrientationY);
                 data.addAll(ActivityPrediction.fusedOrientationZ);

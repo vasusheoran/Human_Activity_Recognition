@@ -27,6 +27,8 @@ public class FilterSensorData implements SensorEventListener {
     private float[] magnet = new float[3];
     // accelerometer vector
     private float[] accel = new float[3];
+    // linear accelerometer vector
+    private float[] linear = new float[3];
     // orientation angles from accel and magnet
     private float[] accMagOrientation = new float[3];
     // final orientation angles from sensor fusion
@@ -40,6 +42,7 @@ public class FilterSensorData implements SensorEventListener {
 
     private static final int TIME_CONSTANT = 30;
     private float filter_coefficient = 0.90f;
+    private final float alpha = 0.9f;
     private ActivityPrediction activityPrediction;
 
     public FilterSensorData(SensorManager manager, ActivityPrediction activityPrediction) {
@@ -79,6 +82,8 @@ public class FilterSensorData implements SensorEventListener {
             mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null)
             mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
+        if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null)
+            mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void unregisterListeners() {
@@ -114,6 +119,12 @@ public class FilterSensorData implements SensorEventListener {
             case Sensor.TYPE_MAGNETIC_FIELD:
                 // Copy new magnetometer data into magnet array
                 System.arraycopy(event.values, 0, magnet, 0, 3);
+//                updateAxis(Constants.MAGNETOMETER);
+                break;
+
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                // Copy new magnetometer data into magnet array
+                System.arraycopy(event.values, 0, linear, 0, 3);
 //                updateAxis(Constants.MAGNETOMETER);
                 break;
         }
@@ -337,12 +348,11 @@ public class FilterSensorData implements SensorEventListener {
                 break;
             //High Pass Pass Filter
             case Constants.FUSEDORIENTATION:
-                result = System.currentTimeMillis() + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + magnet[0] + ","  + magnet[1] + ","  + magnet[2]
+                result = System.currentTimeMillis() + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2]
                         + "," +  data[0] + "," + data[1] + "," + data[2] ;
 
                 break;
         }
-//        Log.d(TAG, "Updating Orientation!" + result);
         if(MainActivity.fw!=null)
             MainActivity.fw.addValues(result, Constants.FUSEDORIENTATION);
         activityPrediction.updateSensorValues(accel,gyro,fusedOrientation);
