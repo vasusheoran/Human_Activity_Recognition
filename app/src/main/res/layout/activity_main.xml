@@ -108,7 +108,7 @@
             <TextView
                 android:id="@+id/walking_title_slow"
                 android:layout_weight="1"
-                android:text="@string/walking_slow"
+                android:text="@string/activity_1"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -142,7 +142,28 @@
         </TableRow>-->
 
         <TableRow
-            android:id="@+id/walking_row"
+            android:id="@+id/walking_normal_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/walking_title_normal"
+                android:layout_weight="1"
+                android:text="@string/activity_2"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/walking_prob_normal"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/walking_fast_row"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="22dp">
@@ -150,7 +171,7 @@
             <TextView
                 android:id="@+id/walking_title_fast"
                 android:layout_weight="1"
-                android:text="@string/walking_fast"
+                android:text="@string/activity_3"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -161,6 +182,27 @@
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
+
+        <TableRow
+            android:id="@+id/spinner_activity"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/activity_type"
+                android:layout_weight="1"
+                android:text="Metadata"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+            <Spinner
+                android:id="@+id/spinner_activity_type"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+        </TableRow>
+
+
 
         <TableLayout
             android:layout_width="match_parent"

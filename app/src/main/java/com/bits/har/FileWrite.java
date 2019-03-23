@@ -172,21 +172,21 @@ public class FileWrite extends BaseActivity {
         try {
             switch (value){
                 case Constants.ACCELEROMETER:
-                    if(this.writerArray[0] !=null){
+                    if(this.writerArray !=null && this.writerArray[0] !=null){
                         this.writerArray[0].append(data + "\n");
                         this.writerArray[0].flush();
                     }
                     break;
 
                 case Constants.GYROSCOPE:
-                    if(this.writerArray[1] !=null){
+                    if(this.writerArray !=null && this.writerArray[1] !=null){
                         this.writerArray[1].append(data + "\n");
                         this.writerArray[1].flush();
                     }
                     break;
 
                 case Constants.FUSEDORIENTATION:
-                    if(this.writerArray[2] !=null){
+                    if(this.writerArray !=null && this.writerArray[2] !=null){
                         this.writerArray[2].append(data + "\n");
                         this.writerArray[2].flush();
                     }

@@ -11,12 +11,12 @@ class TensorFlowClassifier {
     }
 
     private TensorFlowInferenceInterface inferenceInterface;
-    private static final String MODEL_FILE = "file:///android_asset/frozen_v3_har.pb";
+    private static final String MODEL_FILE = "file:///android_asset/frozen_v2.0_har.pb";
     private static final String INPUT_NODE = "input";
     private static final String[] OUTPUT_NODES = {"y_"};
     private static final String OUTPUT_NODE = "y_";
     private static final long[] INPUT_SIZE = {1, 200, 6};
-    private static final int OUTPUT_SIZE = 2;
+    private static final int OUTPUT_SIZE = 3;
 
     TensorFlowClassifier(final Context context) {
         inferenceInterface = new TensorFlowInferenceInterface(context.getAssets(), MODEL_FILE);

@@ -14,7 +14,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,13 +53,30 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     public TextView walkingSlowTextView;
     public TextView walkingFastTextView;
+    public TextView walkingNormalTextView;
     private TextToSpeech textToSpeech;
     public static boolean isVoiceEnabled;
 
     public static float[] results;
     public static SharedPreferences preferences = null;
 
-    private String[] labels = {"Fast", "Slow","Walking"};
+    private Spinner spinnerActivityType;
+    private Spinner spinnerScreenOreintation;
+    private Spinner spinnerPhoneOreintation;
+    private static final String[] METADATA = {"Fast_Towards_Up",
+            "Fast_Towards_Down",
+            "Fast_Away_Up",
+            "Fast_Away_Down",
+            "Normal_Towards_Up",
+            "Normal_Towards_Down",
+            "Normal_Away_Up",
+            "Normal_Away_Down",
+            "Slow_Towards_Up",
+            "Slow_Towards_Down",
+            "Slow_Away_Up",
+            "Slow_Away_Down"};
+    private static final String[] labels = {"Fast", "Normal", "Slow"};
+    private static String activityType = METADATA[5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         activityPrediction = new ActivityPrediction(this);
 
         walkingSlowTextView = findViewById(R.id.walking_prob_slow);
+        walkingNormalTextView = findViewById(R.id.walking_prob_normal);
         walkingFastTextView = findViewById(R.id.walking_prob_fast);
         Switch recordingSwitchtView = findViewById(R.id.record_data);
         Switch predictActivitySwitchtView = findViewById(R.id.enable_voice);
@@ -104,6 +126,26 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
+
+        spinnerActivityType = findViewById(R.id.spinner_activity_type);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this,
+                android.R.layout.simple_spinner_item,METADATA);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerActivityType.setAdapter(adapter);
+        spinnerActivityType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                activityType = METADATA[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
         setSensorManager();
     }
 
@@ -200,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if (!checkPermissions()) return;
         try {
 
-            String filepath = Environment.getExternalStorageDirectory() + "/track/";
+            String filepath = Environment.getExternalStorageDirectory() + "/track/" + activityType ;
             File directory = new File(filepath);
             if (!directory.exists()) {
                 directory.mkdirs();
@@ -245,7 +287,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if(results == null)
             return;
         walkingFastTextView.setText(Float.toString(round(results[0], 2)));
-        walkingSlowTextView.setText(Float.toString(round(results[1], 2)));
+        walkingNormalTextView.setText(Float.toString(round(results[1], 2)));
+        walkingSlowTextView.setText(Float.toString(round(results[2], 2)));
     }
 
     private float[] toFloatArray(List<Float> list) {
@@ -310,9 +353,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 //                data.addAll(ActivityPrediction.gyroX);
 //                data.addAll(ActivityPrediction.gyroY);
 //                data.addAll(ActivityPrediction.gyroZ);
-                data.addAll(ActivityPrediction.fusedOrientationX);
-                data.addAll(ActivityPrediction.fusedOrientationY);
-                data.addAll(ActivityPrediction.fusedOrientationZ);
+                data.addAll(ActivityPrediction.gyroX);
+                data.addAll(ActivityPrediction.gyroY);
+                data.addAll(ActivityPrediction.gyroZ);
                 ActivityPrediction.isPredicting = false;
                 if(data.size() == Constants.BATCH_SIZE){
                     results = activityPrediction.classifier.predictProbabilities(toFloatArray(data));
