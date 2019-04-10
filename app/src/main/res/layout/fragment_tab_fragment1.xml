@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.TabFragment1">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ededed"
+            android:padding="22dp">
+
+            <TableRow
+                android:id="@+id/title_row"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="22dp"
+                android:textAlignment="center">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_weight="1"
+                    android:text="@string/activity"
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold|italic" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_weight="1"
+                    android:text="@string/probability"
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold|italic" />
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/standing_row"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:padding="22dp">
+
+                <TextView
+                    android:id="@+id/walking_title_slow"
+                    android:layout_weight="1"
+                    android:text="@string/activity_1"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/walking_prob_slow"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/walking_normal_row"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="22dp">
+
+                <TextView
+                    android:id="@+id/walking_title_normal"
+                    android:layout_weight="1"
+                    android:text="@string/activity_2"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/walking_prob_normal"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/walking_fast_row"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="22dp">
+
+                <TextView
+                    android:id="@+id/walking_title_fast"
+                    android:layout_weight="1"
+                    android:text="@string/activity_3"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/walking_prob_fast"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/spinner_activity"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:padding="22dp">
+
+                <TextView
+                    android:id="@+id/activity_type"
+                    android:layout_weight="1"
+                    android:text="Metadata"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <Spinner
+                    android:id="@+id/spinner_activity_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+            </TableRow>
+
+
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ededed"
+                android:padding="22dp"
+                tools:context=".main.MainActivity">
+
+
+
+                <TableRow
+                    android:id="@+id/record"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:padding="22dp">
+
+                    <Switch
+                        android:id="@+id/record_data"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Record Data"
+                        android:textSize="18sp"
+                        android:textStyle="bold"  />
+                </TableRow>
+                <TableRow
+                    android:id="@+id/predict"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:padding="22dp">
+
+                    <Switch
+                        android:id="@+id/switch_enable_voice"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Enable Voice"
+                        android:textSize="18sp"
+                        android:textStyle="bold"  />
+                </TableRow>
+
+            </TableLayout>
+        </TableLayout>
+
+
+    </ScrollView>
+
+</FrameLayout>
