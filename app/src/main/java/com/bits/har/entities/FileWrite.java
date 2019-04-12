@@ -5,10 +5,13 @@ import android.util.Log;
 import com.bits.har.metadata.Constants;
 import com.bits.har.main.MainActivity;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class FileWrite extends BaseActivity {
 
@@ -39,38 +42,9 @@ public class FileWrite extends BaseActivity {
     private static File csvFile []= new File[3];
     private static String fileName[] = new String[3];
 
-    public File getFile() {
-        return file;
-    }
-
     public void setFile(File file) {
         this.file = file;
     }
-/*
-    public static void writeToTextFile(String data, Context context) {
-        try {
-            File folder = new File(Environment.getExternalStorageDirectory()
-                    + "/myData");
-
-            boolean var = false;
-            if (!folder.exists())
-                var = folder.mkdir();
-            final String filename = folder.toString() + "/" + "Test.csv";
-            File file = new File(filename);
-
-            Log.d(TAG, "" + var);
-//            FileWriter fw = new FileWriter(filename);
-            PrintWriter p = new PrintWriter(new FileOutputStream(file, true));
-            p.println("Hello");
-
-            *//*OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();*//*
-        }
-        catch (IOException e) {
-            Log.e(TAG, "File write failed: " + e.toString());
-        }
-    }*/
 
     public static String getFileName() {
         final Calendar date = Calendar.getInstance();
@@ -104,43 +78,44 @@ public class FileWrite extends BaseActivity {
 
         return sb.toString();
     }
-/*
-    public void writeData(String data,String strFilePath)
-    {
 
-        PrintWriter csvWriter;
-        try
-        {
 
-            File file = new File(strFilePath);
-            if(!file.exists()){
-                file = new File(strFilePath);
+    public File getFile(String path) {
+        File file = new File(path);
+        return file;
+    }
+
+    public static List<List<String>> readBatch(BufferedReader reader, int batchSize) throws IOException {
+        List<List<String>> list = new ArrayList<>();
+        boolean flag = true;
+        reader.readLine();      //Dummy line for labels
+        while(flag){
+            List<String> result = new ArrayList<>();
+
+            for (int i = 0; i < batchSize; i++) {
+                String line = reader.readLine();
+                if (line != null ) {
+                    result.add(line);
+                } else{
+                    flag = false;
+                    break;
+                }
             }
-            csvWriter = new  PrintWriter(new FileWriter(file,true));
 
-
-            csvWriter.print(data+","+"hello");
-            csvWriter.append('\n');
-            csvWriter.print("world");
-
-
-            csvWriter.close();
-
+                list.add(result);
 
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }*/
+        return list;
+    }
 
-/*
-    public static String readFromFile(Context context) {
+  /*  public File readFromFile(Context context, String path) {
 
         String ret = "";
 
         try {
-            InputStream inputStream = context.openFileInput("config.txt");
+
+            File file = new File(path);
+            InputStream inputStream = context.openFileInput(path);
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -154,15 +129,13 @@ public class FileWrite extends BaseActivity {
                 inputStream.close();
                 ret = stringBuilder.toString();
             }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e("login activity", "Can not read FOLDER: " + e.toString());
         }
 
-        return ret;
+        return file;
     }*/
+
     public void addValues(String data,int value) {
         try {
             switch (value){

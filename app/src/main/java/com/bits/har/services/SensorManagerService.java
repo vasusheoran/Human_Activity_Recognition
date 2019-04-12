@@ -143,7 +143,7 @@ public class SensorManagerService extends Service implements SensorEventListener
         public void run() {
             String result =System.currentTimeMillis() + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2];
 
-            Log.v(TAG, result);
+            Log.d(TAG, result);
             if(FileWriterService.fw!=null)
                 FileWriterService.fw.addValues(result, Constants.FUSEDORIENTATION);
             activityPrediction.updateSensorValues(accel,gyro,linear);

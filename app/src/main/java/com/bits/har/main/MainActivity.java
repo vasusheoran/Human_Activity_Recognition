@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set portrait mode only - for small screens like phones
         setContentView(R.layout.activity_main);
-        activityPrediction = new ActivityPrediction(this);
+        activityPrediction = new ActivityPrediction();
 
         walkingSlowTextView = findViewById(R.id.walking_prob_slow);
         walkingNormalTextView = findViewById(R.id.walking_prob_normal);

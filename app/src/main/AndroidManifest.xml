@@ -9,7 +9,7 @@
         android:name="android.hardware.sensor.gyroscope"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -19,9 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
+            android:name=".services.ClassificationService"
+            android:exported="false"></service>
+        <service
             android:name=".services.FileWriterService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
         <service
             android:name=".services.SensorManagerService"
             android:enabled="true"

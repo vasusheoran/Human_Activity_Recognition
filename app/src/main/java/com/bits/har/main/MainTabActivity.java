@@ -3,10 +3,13 @@ package com.bits.har.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,40 +20,42 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bits.har.entities.TensorFlowClassifier;
+import com.bits.har.fragments.ItemFragment;
 import com.bits.har.metadata.Constants;
 import com.bits.har.R;
 import com.bits.har.entities.ActivityPrediction;
 import com.bits.har.entities.FilterSensorData;
 import com.bits.har.fragments.TabFragment1;
 import com.bits.har.fragments.TabFragment2;
+import com.bits.har.services.ClassificationService;
 import com.bits.har.services.FileWriterService;
-import com.bits.har.services.SensorManagerService;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-public class MainTabActivity extends AppCompatActivity implements TabFragment1.OnFragmentInteractionListener {
+public class MainTabActivity extends AppCompatActivity
+        implements TabFragment1.OnFragmentInteractionListener,TabFragment2.OnFragmentInteractionListener, ItemFragment.OnListFragmentInteractionListener {
     private static final String TAG = "MainTabActivity";
-    public static Intent serviceManagerIntent;
-    public static Intent fileWriterServiceIntent;
 
     private static Activity activity;
     public FilterSensorData mFilterSensorData;
     public static ActivityPrediction activityPrediction;
+    public static TensorFlowClassifier tensorFlowClassifier;
+    public static float[][] results;
+    public static Intent classificationServiceIntent;
+    private static final String[] labels = {"Fast", "Normal", "Slow"};
+
 //    public static FileWrite fw;
 
     //UI for TabFragment1
@@ -64,22 +69,6 @@ public class MainTabActivity extends AppCompatActivity implements TabFragment1.O
 
     //Activity Prediction
 
-    public static float[] results;
-
-    private static final String[] METADATA = {"Fast_Towards_Up",
-            "Fast_Towards_Down",
-            "Fast_Away_Up",
-            "Fast_Away_Down",
-            "Normal_Towards_Up",
-            "Normal_Towards_Down",
-            "Normal_Away_Up",
-            "Normal_Away_Down",
-            "Slow_Towards_Up",
-            "Slow_Towards_Down",
-            "Slow_Away_Up",
-            "Slow_Away_Down"};
-    private static final String[] labels = {"Fast", "Normal", "Slow"};
-    public static String activityType = METADATA[5];
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -89,16 +78,19 @@ public class MainTabActivity extends AppCompatActivity implements TabFragment1.O
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private FragmentTabHost mTabHost;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         activity = this;
-        this.activityPrediction = new ActivityPrediction(activity);
+        this.activityPrediction = new ActivityPrediction();
+        this.tensorFlowClassifier = new TensorFlowClassifier(activity);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
@@ -117,6 +109,11 @@ public class MainTabActivity extends AppCompatActivity implements TabFragment1.O
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+
+        fragmentManager = getSupportFragmentManager();
+
+
 
 
 //        setSensorManager();
@@ -154,9 +151,31 @@ public class MainTabActivity extends AppCompatActivity implements TabFragment1.O
     }
 
     @Override
-    public void onFragmentInteraction(int position) {
+    public void onTabFragment1Interaction(int position) {
 
     }
+
+    @Override
+    public void onTabFragment2Interaction(Uri uri) {
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onListFragmentInteraction(Path item) {
+
+        try {
+
+            Toast.makeText(this, "Classification in Progress ... ", Toast.LENGTH_SHORT).show();
+            List<Float> list = FileWriterService.getFile( item.toAbsolutePath().toString());
+            ClassificationService.startActionClassify(this, list, item.getFileName().toString());
+            Toast.makeText(this, "Finished Classification! Plotting Graphs ..", Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * A placeholder fragment containing a simple view.
@@ -182,87 +201,6 @@ public class MainTabActivity extends AppCompatActivity implements TabFragment1.O
             fragment.setArguments(args);
             return fragment;
         }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-      /*      View rootView = inflater.inflate(R.layout.fragment_main_tab, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;*/
-            View rootView = null;
-            switch (getArguments().getInt(ARG_SECTION_NUMBER))
-            {
-                case 1: {
-                    rootView =  inflater.inflate(R.layout.fragment_tab_fragment1, container, false);
-//                    walkNormal = (TextView) rootView.findViewById(R.id.walking_prob_normal);
-//                    walkNormal.setText("1");
-
-
-                    Switch recordingSwitchtView = rootView.findViewById(R.id.record_data);
-
-                    recordingSwitchtView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            if(isChecked){
-                                Toast.makeText(activity, "Recording Data!", Toast.LENGTH_SHORT)
-                                        .show();
-                                if(fileWriterServiceIntent == null){
-                                    fileWriterServiceIntent = new Intent(activity, FileWriterService.class);
-                                    Log.v(TAG, "Created File Writer Service. ");
-
-                                }
-                                activity.startService(fileWriterServiceIntent);
-                                Log.v(TAG, "Started File Writer Service. ");
-
-                                if(serviceManagerIntent == null){
-                                    serviceManagerIntent = new Intent(activity, SensorManagerService.class);
-                                    Log.v(TAG, "Created Sensor Manager Service. ");
-
-                                }
-                                activity.startService(serviceManagerIntent);
-                                Log.v(TAG, "Started Sensor");
-                            }else {
-                                Toast.makeText(activity, "Saving Data...", Toast.LENGTH_SHORT)
-                                        .show();
-                                activity.stopService(fileWriterServiceIntent);
-                                activity.stopService(serviceManagerIntent);
-                            }
-
-                        }
-                    });
-
-
-
-                    Spinner spinnerActivityType =  rootView.findViewById(R.id.spinner_activity_type);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(activity,
-                            android.R.layout.simple_spinner_item,METADATA);
-
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinnerActivityType.setAdapter(adapter);
-                    spinnerActivityType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                            activityType = METADATA[position];
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-
-                        }
-                    });
-                    break;
-                }
-                case 2: {
-                    rootView =  inflater.inflate(R.layout.fragment_main_tab, container, false);
-                    TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-                    textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-
-                    break;
-                }
-
-            }
-            return rootView;
-        }
     }
 
     /**
@@ -275,11 +213,27 @@ public class MainTabActivity extends AppCompatActivity implements TabFragment1.O
             super(fm);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public Fragment getItem(int position) {
+            Fragment fragment = null;
+
+            switch(position) {
+                case 0:
+                    fragment = new TabFragment1();
+                    break;
+                case 1:
+                    ItemFragment itemFragment = (ItemFragment) ItemFragment.newInstance();
+
+                    if(ItemFragment.isViewUpdated)
+                        itemFragment.updateView();
+
+                    fragment = itemFragment;
+                    break;
+            }
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            return fragment;
         }
 
         @Override
@@ -287,22 +241,6 @@ public class MainTabActivity extends AppCompatActivity implements TabFragment1.O
             // Show 3 total pages.
             return 2;
         }
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        if (fragment instanceof TabFragment1) {
-            TabFragment1 tb1 = new TabFragment1();
-
-        }
-        if (fragment instanceof TabFragment2) {
-            TabFragment2 tb1 = new TabFragment2();
-          /*
-            Intent i = new Intent(this, SensorManagerService.class);
-            startService(i);*/
-            Log.v(TAG, "Started Tab 2. ");
-        }
-
     }
 
 

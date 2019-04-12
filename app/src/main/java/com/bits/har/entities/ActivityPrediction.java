@@ -4,7 +4,9 @@ import android.app.Activity;
 
 import com.bits.har.metadata.Constants;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class ActivityPrediction{
@@ -21,6 +23,8 @@ public class ActivityPrediction{
     public  static Queue<Float> fusedOrientationX = new LinkedList<>();
     public  static Queue<Float> fusedOrientationY = new LinkedList<>();
     public  static Queue<Float> fusedOrientationZ = new LinkedList<>();
+
+    public static List<Float> reshapedData = new ArrayList<>();
     public  int size=0;
 
 
@@ -59,8 +63,26 @@ public class ActivityPrediction{
         fusedOrientationZ.add(fusedOrientation[2]);
     }
 
-    public ActivityPrediction(Activity activity) {
-        this.classifier = new TensorFlowClassifier(activity);
+    public static void clearQueues(){
+        accX.clear();
+        accY.clear();
+        accZ.clear();
+        gyroX.clear();
+        gyroY.clear();
+        gyroZ.clear();
+    }
+
+    public static void addQueueToResaphedData(){
+        reshapedData.addAll(accX);
+        reshapedData.addAll(accY);
+        reshapedData.addAll(accZ);
+        reshapedData.addAll(gyroX);
+        reshapedData.addAll(gyroY);
+        reshapedData.addAll(gyroZ);
+    }
+
+    public ActivityPrediction() {
+//        this.classifier = new TensorFlowClassifier(activity);
     }
 /*
     private  float round(float d, int decimalPlace) {
