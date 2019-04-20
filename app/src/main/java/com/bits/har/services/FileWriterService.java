@@ -34,7 +34,7 @@ public class FileWriterService extends Service {
 
     private static final String TAG = "FileWriterService";
 
-    private static List<Float> reshapedData;
+    public static List<Float> reshapedData;
     public static List<String> timestamps;
 
     private ActivityPrediction activityPrediction;
@@ -168,11 +168,17 @@ public class FileWriterService extends Service {
         }
     }
 
-    public static List<Float> getFile(String path) throws IOException {
+    public static List<Float> getReshapedData(String path) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
         List<List<String>> list = FileWrite.readBatch(reader, Constants.N_SAMPLES);
+        if(list==null)
+            return null;
         reshape(list);
         return reshapedData;
+    }
+
+    public static File getFile(String path){
+        return FileWrite.getFile(path);
     }
 
 }

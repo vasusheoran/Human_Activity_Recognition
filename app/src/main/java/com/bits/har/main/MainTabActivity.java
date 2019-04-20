@@ -3,8 +3,6 @@ package com.bits.har.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
@@ -19,7 +17,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -34,18 +31,16 @@ import com.bits.har.R;
 import com.bits.har.entities.ActivityPrediction;
 import com.bits.har.entities.FilterSensorData;
 import com.bits.har.fragments.TabFragment1;
-import com.bits.har.fragments.TabFragment2;
 import com.bits.har.services.ClassificationService;
 import com.bits.har.services.FileWriterService;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MainTabActivity extends AppCompatActivity
-        implements TabFragment1.OnFragmentInteractionListener,TabFragment2.OnFragmentInteractionListener, ItemFragment.OnListFragmentInteractionListener {
+        implements TabFragment1.OnFragmentInteractionListener, ItemFragment.OnListFragmentInteractionListener {
     private static final String TAG = "MainTabActivity";
 
     private static Activity activity;
@@ -55,6 +50,8 @@ public class MainTabActivity extends AppCompatActivity
     public static float[][] results;
     public static Intent classificationServiceIntent;
     private static final String[] labels = {"Fast", "Normal", "Slow"};
+    public static Fragment itemFragment;
+//    public static String resultFileName;
 
 //    public static FileWrite fw;
 
@@ -112,20 +109,6 @@ public class MainTabActivity extends AppCompatActivity
 
 
         fragmentManager = getSupportFragmentManager();
-
-
-
-
-//        setSensorManager();
-    }
-
-    private void setSensorManager() {
-
-        SensorManager mSensorManger = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mFilterSensorData = new FilterSensorData(mSensorManger, activityPrediction);
-
-//        preferences = PreferenceManager.getDefaultSharedPreferences(this); // Create SharedPreferences instance
-
     }
 
     @Override
@@ -155,10 +138,15 @@ public class MainTabActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onTabFragment2Interaction(Uri uri) {
+    public void sendMessage(String path) {
 
+        String FILE_PATH = "com.bits.har.main.GraphPlotActivity";
+        Intent intent = new Intent(this, GraphPlotActivity.class);
+        intent.putExtra(FILE_PATH, path);
+//        editText.setText("asdfasf");
+        startActivity(intent);
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -167,9 +155,16 @@ public class MainTabActivity extends AppCompatActivity
         try {
 
             Toast.makeText(this, "Classification in Progress ... ", Toast.LENGTH_SHORT).show();
-            List<Float> list = FileWriterService.getFile( item.toAbsolutePath().toString());
-            ClassificationService.startActionClassify(this, list, item.getFileName().toString());
-            Toast.makeText(this, "Finished Classification! Plotting Graphs ..", Toast.LENGTH_SHORT).show();
+            List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
+
+            if(list == null){
+                Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            ClassificationService.startActionClassify(this, item.getFileName().toString());
+
+            sendMessage(Constants.RESULT_PATH + item.getFileName().toString());
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -223,12 +218,18 @@ public class MainTabActivity extends AppCompatActivity
                     fragment = new TabFragment1();
                     break;
                 case 1:
+//                    fragment = new Graph();
+//                    MainTabActivity.itemFragment = fragment;
                     ItemFragment itemFragment = (ItemFragment) ItemFragment.newInstance();
 
                     if(ItemFragment.isViewUpdated)
                         itemFragment.updateView();
 
                     fragment = itemFragment;
+                    MainTabActivity.itemFragment = fragment;
+
+                    /*fragment = Graph.newInstance();
+                    */
                     break;
             }
             // getItem is called to instantiate the fragment for the given page.

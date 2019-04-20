@@ -80,7 +80,7 @@ public class FileWrite extends BaseActivity {
     }
 
 
-    public File getFile(String path) {
+    public static File getFile(String path) {
         File file = new File(path);
         return file;
     }
@@ -88,6 +88,7 @@ public class FileWrite extends BaseActivity {
     public static List<List<String>> readBatch(BufferedReader reader, int batchSize) throws IOException {
         List<List<String>> list = new ArrayList<>();
         boolean flag = true;
+        boolean isValid = false;
         reader.readLine();      //Dummy line for labels
         while(flag){
             List<String> result = new ArrayList<>();
@@ -98,11 +99,14 @@ public class FileWrite extends BaseActivity {
                     result.add(line);
                 } else{
                     flag = false;
+                    if(!isValid)
+                        list=null;
                     break;
                 }
             }
 
-                list.add(result);
+            list.add(result);
+            isValid=true;
 
         }
         return list;

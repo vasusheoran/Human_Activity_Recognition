@@ -18,9 +18,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".main.GraphPlotActivity"
+            android:label="@string/title_activity_graph_plot"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <service
             android:name=".services.ClassificationService"
-            android:exported="false"></service>
+            android:exported="false" />
         <service
             android:name=".services.FileWriterService"
             android:enabled="true"
