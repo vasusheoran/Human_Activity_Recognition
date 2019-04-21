@@ -112,34 +112,6 @@ public class FileWrite extends BaseActivity {
         return list;
     }
 
-  /*  public File readFromFile(Context context, String path) {
-
-        String ret = "";
-
-        try {
-
-            File file = new File(path);
-            InputStream inputStream = context.openFileInput(path);
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        } catch (Exception e) {
-            Log.e("login activity", "Can not read FOLDER: " + e.toString());
-        }
-
-        return file;
-    }*/
-
     public void addValues(String data,int value) {
         try {
             switch (value){

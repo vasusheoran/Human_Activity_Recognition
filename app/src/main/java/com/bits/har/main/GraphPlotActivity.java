@@ -1,5 +1,6 @@
 package com.bits.har.main;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,9 +12,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bits.har.R;
+import com.bits.har.entities.ResultViewDummy;
 import com.bits.har.metadata.Constants;
 import com.bits.har.services.FileWriterService;
 import com.jjoe64.graphview.GraphView;
@@ -23,36 +28,50 @@ import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class GraphPlotActivity extends AppCompatActivity {
+    private static final String TAG = "GraphPlotActivity";
     private GraphView graph;
-    List<Float> results;
     List<Date> date;
     List<String> dateList;
-    List<Integer> label;
-    private static final String[] labels = {"Fast", "Normal", "Slow"};
+    List<Integer> label=  new ArrayList<>();
+    List<String> durationLabel=  new ArrayList<>();
+    List<Integer> time=  new ArrayList<>();
+    List<DataPoint> dp = new ArrayList<>();
+    public  Activity graphPlotActivity=null;
+    long slow, normal, fast;
+
     private static final String FILE_PATH = "com.bits.har.main.GraphPlotActivity";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        graphPlotActivity = this;
+
+
         setContentView(R.layout.activity_graph_plot);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,158 +86,144 @@ public class GraphPlotActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void readCVS(String path){
-        label = new ArrayList<>();
-        date = new ArrayList<>();
-        dateList = new ArrayList<>();
+        List<ResultViewDummy> resultViewDummyList = new ArrayList<>();
+
         String[] content = null;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(FileWriterService.getFile(path))));
             String line = "";
-            String tempLabels = br.readLine();
+            br.readLine();
 
-            int j=0;
+            for(int i=0; (line = br.readLine()) != null ; i++){
 
-            while((line = br.readLine()) != null){
-                results = new ArrayList<>();
                 content = line.split(",");
-                int index = 0;
-                for (String item: content) {
-                    if(item== null)
-                        continue;
+                dp.add(new DataPoint(i, Integer.parseInt(content[2])));
 
-                    if(index==0){
-                        Timestamp stamp = new Timestamp(Long.parseLong(item));
-                        Date d = new Date(stamp.getTime());
- /*                       String dateString = String.valueOf(d.getHours()) + ":" + String.valueOf(d.getMinutes());
-                        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss a", Locale.US);
-                        String str = format.format(d);
-                        dateList.add(dateString);*/
-                        date.add(d);
-                    }
-                    else
-                        results.add(Float.parseFloat(item));
-
-                    index++;
+                if(content[1].equals("Slow")){
+                    this.slow += 5;
+                }else if(content[1].equals("Normal")){
+                    this.normal += 5;
+                }else if(content[1].equals("Fast")){
+                    this.fast += 5;
                 }
-                float max = -1;
-                int idx = -1;
-                for (int i = 0; i < results.size(); i++) {
-                    if (results.get(i)> max) {
-                        idx = i;
-                        max = results.get(i);
-                    }
-                }
-
-                label.add(Constants.N_FEATURES - idx );
-
             }
+
             br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-    private void createBarChartGraph(){
-       /* DataPoint[] dataPoints = new DataPoint[label.size()];
-        for (int i = 0; i < label.size(); i++){
-            dataPoints[i] = new DataPoint(Integer.parseInt(String.valueOf(date.get(i))), label.get(i));
+    public static String splitToComponentTimes(long longVal)
+    {
+        int hours = (int) longVal / 3600;
+        int remainder = (int) longVal - hours * 3600;
+        int mins = remainder / 60;
+        remainder = remainder - mins * 60;
+        int secs = remainder;
+        String result= null;
+        if(hours == 0){
+                if(mins == 0)
+                    result = secs + " s";
+                else
+                    result = mins + "." + secs + " m";
+        }else{
+            if(mins == 0){
+                result = hours + " h";
+            }else
+                result = hours + "." + mins + " h";
         }
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<DataPoint>(dataPoints);
-        mGraph.addSeries(series);
-       *//* series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
-            @Override
-            public int get(DataPoint data) {
-                return Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100);
-            }
-        });*//*
-        series.setSpacing(50);*/
-        DataPoint[] dataPoints = new DataPoint[label.size()];
-        for (int i = 0; i < label.size(); i++){
-            dataPoints[i] = new DataPoint(date.get(i), label.get(i));
-        }
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoints);
 
-        graph.addSeries(series);
-
-// set date label formatter
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
-
-// set manual x bounds to have nice steps
-//        graph.getViewport().setXAxisBoundsManual(true);
-//        graph.getViewport().setMinX(date.get(0).getTime());
-//        graph.getViewport().setMaxX(date.get(date.size()-1).getTime());
-
-
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(3);
-
-        graph.getViewport().setScrollable(true); // enables horizontal scrolling
-//        graph.getViewport().setScrollableY(true); // enables vertical scrolling
-
-        // styling
-        series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
-            @Override
-            public int get(DataPoint data) {
-                return Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100);
-            }
-        });
-
-        series.setSpacing(50);
-
-// draw values on top
-        series.setDrawValuesOnTop(true);
-        series.setValuesOnTopColor(Color.RED);
-        graph.getGridLabelRenderer().setHumanRounding(false);
+        return result;
     }
 
     public DataPoint[] getDataPoints(){
-        DataPoint[] dataPoints = new DataPoint[label.size()];
-        for (int i = 0; i < label.size(); i++){
-            dataPoints[i] = new DataPoint(date.get(i), Integer.parseInt(String.valueOf(label.get(i))));
+        DataPoint[] dataPoints = new DataPoint[label.size() +1];
+        int i;
+        for ( i = 0; i < label.size(); i++){
+            dataPoints[i] = new DataPoint(time.get(i) , Integer.parseInt(String.valueOf(label.get(i))));
         }
+
+//        if(dataPoints.length <2)
+        dataPoints[i] = new DataPoint(time.get(i-1)+1,0);
+        return dataPoints;
+    }
+
+    public DataPoint[] getDataPoints_dp(){
+        DataPoint[] dataPoints = dp.toArray(new DataPoint[dp.size()]);
         return dataPoints;
     }
 
     public void defaultGraph(){
-
+        TextView walkingFast = findViewById(R.id.graph_view_walking_prob_fast);
+        TextView walkingNormal = findViewById(R.id.graph_view_walking_prob_normal);
+        TextView walkingSlow = findViewById(R.id.graph_view_walking_prob_slow);
+        walkingSlow.setText(splitToComponentTimes(this.slow));
+        walkingNormal.setText(splitToComponentTimes(this.normal));
+        walkingFast.setText(splitToComponentTimes(this.fast));
 
         graph = findViewById(R.id.graph);
-        graph.getGridLabelRenderer().setVerticalAxisTitle("Labels");
-//        graph.getGridLabelRenderer().setHorizontalAxisTitle("Labels");
+//        graph.getGridLabelRenderer().setVerticalAxisTitle("Labels");
+//        graph.getGridLabelRenderer().setHorizontalAxisTitle("");
 
-        DataPoint[] points = getDataPoints();
+//        DataPoint[] points = getDataPoints();
+        DataPoint[] points = getDataPoints_dp();
 
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(points);
+        Log.d(TAG, Arrays.toString(points));
+
+
+//        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(points);
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
 
 //        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
 //        staticLabelsFormatter.setVerticalLabels(new String[] {"Slow", "Normal", "Fast"});
 
 //        String[] strListString = dateList.toString().replaceAll("\\[|\\]", "").split(",");
 
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss a", Locale.US);
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,format));
-        graph.getGridLabelRenderer().setHorizontalLabelsAngle(20);
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+
+        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
+//
+//        String[] horizontalLabels = durationLabel.toArray(new String[durationLabel.size()]);
+//        staticLabelsFormatter.setHorizontalLabels(horizontalLabels);
+        staticLabelsFormatter.setVerticalLabels(new String[] {"", "S", "N", "F"});
+//        Log.v(TAG, Arrays.toString(horizontalLabels));
+
+
+        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+//        graph.getGridLabelRenderer().setHorizontalLabelsAngle(20);
+//        graph.getGridLabelRenderer().setNumHorizontalLabels(5);
         // set manual X bounds
-
-        graph.getViewport().setMinX(date.get(0).getTime());
-        graph.getViewport().setMaxX(date.get(date.size()-1).getTime());
-        graph.getViewport().setXAxisBoundsManual(true);
-
         graph.getViewport().setMinY(0);
         graph.getViewport().setMaxY(3);
         graph.getViewport().setYAxisBoundsManual(true);
 
-        // enable scaling and scrolling
+
+//        graph.getViewport().setMinX(-5);
+        graph.getViewport().setMaxX(dp.size() + 5);
+        graph.getViewport().setXAxisBoundsManual(true);
+
+//         enable scaling and scrolling
         graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);
-        series.setValueDependentColor(data -> Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100));
+//        series.setValueDependentColor(data -> Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100));
 
-        series.setSpacing(10);
+//        series.setSpacing(5);
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Double d  = dataPoint.getX();
+                int length = d.intValue() * Constants.YIELD;
+                Log.d(TAG, length + "");
+                if(length<60)
+                    Toast.makeText(graphPlotActivity, "Time: "+ (length) + " secs" , Toast.LENGTH_SHORT).show();
+                else if(length < 3600)
+                    Toast.makeText(graphPlotActivity, "Time: "+ (length / 60) + " mins and " + (length % 60) + " secs", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(graphPlotActivity, "Time: "+ (length / 3600) + " hrs and " + (length % 3600) + " mins" , Toast.LENGTH_SHORT).show();
 
+
+            }
+        });
         graph.addSeries(series);
     }
 

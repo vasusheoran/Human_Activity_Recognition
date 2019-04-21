@@ -6,6 +6,7 @@ import android.content.Context;
 
 import com.bits.har.entities.FileWrite;
 import com.bits.har.fragments.TabFragment1;
+import com.bits.har.main.GraphPlotActivity;
 import com.bits.har.main.MainTabActivity;
 import com.bits.har.metadata.Constants;
 
@@ -23,6 +24,7 @@ import java.util.List;
  * helper methods.
  */
 public class ClassificationService extends IntentService {
+    private static final String TAG = "ClassificationService";
 
     List<Float> data;
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
@@ -32,6 +34,7 @@ public class ClassificationService extends IntentService {
     private static final String LIST_DATA = "com.bits.har.services.extra.LIST_DATA";
     private static final String LIST_TIMESTAMP = "com.bits.har.services.extra.LIST_TIMESTAMP";
     private static final String FILE_NAME = "com.bits.har.services.extra.FILE_NAME";
+    private static final String[] labels = {"Fast", "Normal", "Slow"};
 
     public ClassificationService() {
         super("ClassificationService");
@@ -79,9 +82,21 @@ public class ClassificationService extends IntentService {
                 final String file_name = intent.getStringExtra(FILE_NAME);
                 float[][] result = handleActionFoo();
                 handleActionWrite(result, file_name);
+
+                startGraphView(intent);
                 stopSelf();
             }
         }
+    }
+
+    private void startGraphView(Intent intent){
+
+        String FILE_PATH = "com.bits.har.main.GraphPlotActivity";
+        Intent graphViewIntent = new Intent(this, GraphPlotActivity.class);
+        final String file_name = intent.getStringExtra(FILE_NAME);
+        graphViewIntent.putExtra(FILE_PATH,Constants.RESULT_PATH + file_name);
+//        editText.setText("asdfasf");
+        startActivity(graphViewIntent);
     }
 
     /**
@@ -114,10 +129,22 @@ public class ClassificationService extends IntentService {
 
             File csvFileFused = new File(directory, fileName);
             FileWriter writerFused = new FileWriter(csvFileFused);
-            writerFused.append("time,Fast,Normal,Slow\n");
+            writerFused.append("time,activity,index,confidence\n");
 
             for(int i=0; i<result.length;i++){
-                String res =  timeStamp.get(i) + "," + Float.toString(result[i][0]) + "," + Float.toString(result[i][1]) + "," + Float.toString(result[i][2]) + "\n";
+
+
+                float max = -1;
+                int idx = -1;
+                for (int j = 0; j < result[i].length; j++) {
+                    if (result[i][j] > max) {
+                        idx = j;
+                        max = result[i][j];
+                    }
+                }
+
+                // (idx + 1) is done for better graph views
+                String res =  timeStamp.get(i) + "," + labels[idx] + "," + (idx + 1)+  "," + max + "\n";
                 writerFused.append(res);
             }
             writerFused.flush();

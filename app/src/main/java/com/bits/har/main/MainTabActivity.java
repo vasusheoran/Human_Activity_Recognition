@@ -34,6 +34,7 @@ import com.bits.har.fragments.TabFragment1;
 import com.bits.har.services.ClassificationService;
 import com.bits.har.services.FileWriterService;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -151,19 +152,28 @@ public class MainTabActivity extends AppCompatActivity
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onListFragmentInteraction(Path item) {
+        Toast.makeText(activity, item.getFileName().toString() + " selected", Toast.LENGTH_SHORT).show();
 
         try {
 
-            Toast.makeText(this, "Classification in Progress ... ", Toast.LENGTH_SHORT).show();
-            List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
 
-            if(list == null){
-                Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
-                return;
+
+            File f = new File(Constants.RESULT_PATH + item.getFileName().toString());
+            if(f.exists() && !f.isDirectory()) {
+                // do something
+                sendMessage(Constants.RESULT_PATH + item.getFileName().toString());
+            }else{
+
+                List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
+
+                if(list == null){
+                    Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ClassificationService.startActionClassify(this, item.getFileName().toString());
             }
-            ClassificationService.startActionClassify(this, item.getFileName().toString());
 
-            sendMessage(Constants.RESULT_PATH + item.getFileName().toString());
+//
 
 
         } catch (IOException e) {

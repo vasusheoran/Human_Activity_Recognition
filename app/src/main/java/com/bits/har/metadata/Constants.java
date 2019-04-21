@@ -10,6 +10,9 @@ public class Constants {
     public static final int MAGNETOMETER = 3;
     public static final int FUSEDORIENTATION = 4;
 
+
+    public static final int YIELD = 5;              // A new classification every 5 sec.
+
     public static final int N_SAMPLES = 200;
     public static final int BATCH_SIZE = N_SAMPLES * 6;
     public static final int N_FEATURES = 3;

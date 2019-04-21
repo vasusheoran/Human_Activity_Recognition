@@ -20,7 +20,114 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/graph_view" />
+
+
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ededed"
+        android:padding="10dp">
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp"
+            android:textAlignment="center">
+
+        </TableRow>
+
+        <include layout="@layout/graph_view" />
+
+        <TableRow
+            android:id="@+id/graph_view_title_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp"
+            android:textAlignment="center">
+
+            <TextView
+                android:id="@+id/graph_view_title"
+                android:layout_weight="1"
+                android:text="@string/activity"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/graph_view_textView"
+                android:layout_weight="1"
+                android:text="@string/duration"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/graph_view_standing_row"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/graph_view_walking_title_slow"
+                android:layout_weight="1"
+                android:text="@string/activity_1"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/graph_view_walking_prob_slow"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/graph_view_walking_normal_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/graph_view_walking_title_normal"
+                android:layout_weight="1"
+                android:text="@string/activity_2"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/graph_view_walking_prob_normal"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/graph_view_walking_fast_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/graph_view_walking_title_fast"
+                android:layout_weight="1"
+                android:text="@string/activity_3"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/graph_view_walking_prob_fast"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
+
+
+
+    </TableLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

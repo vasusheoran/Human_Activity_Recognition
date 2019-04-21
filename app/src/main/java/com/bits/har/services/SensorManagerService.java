@@ -141,7 +141,9 @@ public class SensorManagerService extends Service implements SensorEventListener
 
     class UpdateWindow extends TimerTask {
         public void run() {
-            String result =System.currentTimeMillis() + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2];
+
+            // Store time in secs
+            String result =(System.currentTimeMillis()/1000L) + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2];
 
             Log.d(TAG, result);
             if(FileWriterService.fw!=null)
