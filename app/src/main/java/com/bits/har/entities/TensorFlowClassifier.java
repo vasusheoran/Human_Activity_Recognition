@@ -48,9 +48,6 @@ public class TensorFlowClassifier {
         inferenceInterface.run(OUTPUT_NODES);
         inferenceInterface.fetch(OUTPUT_NODE, result);
 
-
-
-        //Downstairs	Jogging	  Sitting	Standing	Upstairs	Walking
         return reshapeResult(result, length, Constants.N_FEATURES);
     }
 }

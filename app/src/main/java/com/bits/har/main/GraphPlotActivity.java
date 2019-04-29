@@ -164,7 +164,7 @@ public class GraphPlotActivity extends AppCompatActivity {
 
         graph = findViewById(R.id.graph);
 //        graph.getGridLabelRenderer().setVerticalAxisTitle("Labels");
-//        graph.getGridLabelRenderer().setHorizontalAxisTitle("");
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
 
 //        DataPoint[] points = getDataPoints();
         DataPoint[] points = getDataPoints_dp();
