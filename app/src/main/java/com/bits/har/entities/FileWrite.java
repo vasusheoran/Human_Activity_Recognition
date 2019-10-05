@@ -3,7 +3,6 @@ package com.bits.har.entities;
 import android.util.Log;
 
 import com.bits.har.metadata.Constants;
-import com.bits.har.main.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,43 +12,22 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class FileWrite extends BaseActivity {
+public class FileWrite  {
 
-    private static final String TAG = "FilterSensorData";
-    private File file;
-
-    public FileWriter[] getWriterArray() {
-        return writerArray;
-    }
-
+    private static final String TAG = "FileWrite";
     public void setWriterArray(FileWriter[] writerArray) {
         this.writerArray = writerArray;
     }
-
-    public File[] getCsvFile() {
-        return csvFile;
-    }
-
     public void setCsvFile(File[] csvFile) {
         this.csvFile = csvFile;
     }
 
-    public static void setFileName(String[] fileName) {
-        FileWrite.fileName = fileName;
-    }
-
     private static FileWriter writerArray[] = new FileWriter[3];
     private static File csvFile []= new File[3];
-    private static String fileName[] = new String[3];
 
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public static String getFileName() {
+    public static String getFileName(String activity_type) {
         final Calendar date = Calendar.getInstance();
         final StringBuilder sb = new StringBuilder();
-
 
         final int year = date.get(Calendar.YEAR);
         final int month = 1 + date.get(Calendar.MONTH);
@@ -92,7 +70,6 @@ public class FileWrite extends BaseActivity {
         reader.readLine();      //Dummy line for labels
         while(flag){
             List<String> result = new ArrayList<>();
-
             for (int i = 0; i < batchSize; i++) {
                 String line = reader.readLine();
                 if (line != null ) {
@@ -100,13 +77,13 @@ public class FileWrite extends BaseActivity {
                 } else{
                     flag = false;
                     if(!isValid)
-                        list=null;
+                        result=null;
                     break;
                 }
             }
 
-            list.add(result);
-            isValid=true;
+            if(result != null)
+                list.add(result);
 
         }
         return list;
@@ -155,6 +132,5 @@ public class FileWrite extends BaseActivity {
 
         this.writerArray = null;
         this.csvFile = null;
-        MainActivity.fw = null;
     }
 }

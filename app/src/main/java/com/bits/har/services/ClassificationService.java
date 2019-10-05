@@ -4,8 +4,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 
-import com.bits.har.entities.FileWrite;
-import com.bits.har.fragments.TabFragment1;
 import com.bits.har.main.GraphPlotActivity;
 import com.bits.har.main.MainTabActivity;
 import com.bits.har.metadata.Constants;
@@ -14,7 +12,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -29,10 +26,6 @@ public class ClassificationService extends IntentService {
     List<Float> data;
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_CLASSIFY = "com.bits.har.services.action.CLASSIFY";
-    private static final String ACTION_BAZ = "com.bits.har.services.action.BAZ";
-
-    private static final String LIST_DATA = "com.bits.har.services.extra.LIST_DATA";
-    private static final String LIST_TIMESTAMP = "com.bits.har.services.extra.LIST_TIMESTAMP";
     private static final String FILE_NAME = "com.bits.har.services.extra.FILE_NAME";
     private static final String[] labels = {"Fast", "Normal", "Slow"};
 
@@ -46,24 +39,10 @@ public class ClassificationService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionClassify(Context context,String name) {
+    public static void startActionClassify(Context context, String name) {
         Intent intent = new Intent(context, ClassificationService.class);
         intent.setAction(ACTION_CLASSIFY);
         intent.putExtra(FILE_NAME,name);
-        context.startService(intent);
-    }
-
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, ClassificationService.class);
-        intent.setAction(ACTION_BAZ);
-//        intent.putExtra(EXTRA_PARAM_LIST, param1);
-//        intent.putExtra(EXTRA_PARAM2, param2);
         context.startService(intent);
     }
 
@@ -80,7 +59,7 @@ public class ClassificationService extends IntentService {
 //                final List<Float> list = FileWriterService.reshapedData;
 //                final List<String> ts = FileWriterService.timestamps;
                 final String file_name = intent.getStringExtra(FILE_NAME);
-                float[][] result = handleActionFoo();
+                float[][] result = classify();
                 handleActionWrite(result, file_name);
 
                 startGraphView(intent);
@@ -95,7 +74,6 @@ public class ClassificationService extends IntentService {
         Intent graphViewIntent = new Intent(this, GraphPlotActivity.class);
         final String file_name = intent.getStringExtra(FILE_NAME);
         graphViewIntent.putExtra(FILE_PATH,Constants.RESULT_PATH + file_name);
-//        editText.setText("asdfasf");
         startActivity(graphViewIntent);
     }
 
@@ -103,7 +81,7 @@ public class ClassificationService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private float[][] handleActionFoo() {
+    private float[][] classify() {
         final List<Float> list = FileWriterService.reshapedData;
         if(list == null)
             throw new UnsupportedOperationException("Not yet implemented");
@@ -111,7 +89,6 @@ public class ClassificationService extends IntentService {
             this.data = list;
 //        list.
         return MainTabActivity.tensorFlowClassifier.predictProbabilities(toFloatArray(list), list.size() / Constants.BATCH_SIZE);
-//        Toast.makeText(this, result.toString(), Toast.LENGTH_SHORT).show();
 
     }
 
@@ -155,14 +132,6 @@ public class ClassificationService extends IntentService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1) {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private float[] toFloatArray(List<Float> list) {

@@ -3,7 +3,6 @@ package com.bits.har.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -11,7 +10,7 @@ import android.widget.Toast;
 
 import com.bits.har.entities.ActivityPrediction;
 import com.bits.har.entities.FileWrite;
-import com.bits.har.fragments.TabFragment1;
+import com.bits.har.fragments.TabFragmentDataCollection;
 import com.bits.har.main.MainTabActivity;
 import com.bits.har.metadata.Constants;
 
@@ -68,16 +67,16 @@ public class FileWriterService extends Service {
 
     public void startSession() {
         fw = new FileWrite();
-        String fileName = FileWrite.getFileName();
+        String fileName = FileWrite.getFileName(TabFragmentDataCollection.activityType);
         if (!MainTabActivity.checkPermissions()) return;
         try {
-            String filePath = filePathHome + TabFragment1.activityType ;
+            String filePath = filePathHome + TabFragmentDataCollection.activityType + "/" + TabFragmentDataCollection.orientationType;
 
             File directory = new File(filePath);
             if (!directory.exists()) {
                 directory.mkdirs();
             }
-            File csvFileFused = new File(directory,"fused_" +  fileName);
+            File csvFileFused = new File(directory, fileName);
             FileWriter writerFused = new FileWriter(csvFileFused);
             writerFused.append("time,ax,ay,az,gx,gy,gz,la_x,la_y,la_z,fox,foy,foz\n");
             writerFused.flush();
@@ -171,8 +170,6 @@ public class FileWriterService extends Service {
     public static List<Float> getReshapedData(String path) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
         List<List<String>> list = FileWrite.readBatch(reader, Constants.N_SAMPLES);
-        if(list==null)
-            return null;
         reshape(list);
         return reshapedData;
     }

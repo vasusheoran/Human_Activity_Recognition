@@ -7,7 +7,6 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,7 +19,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,41 +27,32 @@ import com.bits.har.fragments.ItemFragment;
 import com.bits.har.metadata.Constants;
 import com.bits.har.R;
 import com.bits.har.entities.ActivityPrediction;
-import com.bits.har.entities.FilterSensorData;
-import com.bits.har.fragments.TabFragment1;
+import com.bits.har.fragments.TabFragmentDataCollection;
 import com.bits.har.services.ClassificationService;
 import com.bits.har.services.FileWriterService;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainTabActivity extends AppCompatActivity
-        implements TabFragment1.OnFragmentInteractionListener, ItemFragment.OnListFragmentInteractionListener {
+        implements TabFragmentDataCollection.OnFragmentInteractionListener, ItemFragment.OnListFragmentInteractionListener {
     private static final String TAG = "MainTabActivity";
 
     private static Activity activity;
-    public FilterSensorData mFilterSensorData;
     public static ActivityPrediction activityPrediction;
     public static TensorFlowClassifier tensorFlowClassifier;
-    public static float[][] results;
-    public static Intent classificationServiceIntent;
     private static final String[] labels = {"Fast", "Normal", "Slow"};
     public static Fragment itemFragment;
-//    public static String resultFileName;
 
-//    public static FileWrite fw;
-
-    //UI for TabFragment1
+    //UI for TabFragmentDataCollection
 
     public TextView walkingSlowTextView;
     public TextView walkingFastTextView;
     public TextView walkingNormalTextView;
 //    private TextToSpeech textToSpeech;
 //    public static boolean isVoiceEnabled;
-    private Spinner spinnerActivityType;
 
     //Activity Prediction
 
@@ -76,7 +65,6 @@ public class MainTabActivity extends AppCompatActivity
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private FragmentTabHost mTabHost;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -103,7 +91,7 @@ public class MainTabActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -157,23 +145,29 @@ public class MainTabActivity extends AppCompatActivity
         try {
 
 
+            List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
 
-            File f = new File(Constants.RESULT_PATH + item.getFileName().toString());
-            if(f.exists() && !f.isDirectory()) {
-                // do something
-                sendMessage(Constants.RESULT_PATH + item.getFileName().toString());
-            }else{
-
-                List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
-
-                if(list == null){
-                    Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                ClassificationService.startActionClassify(this, item.getFileName().toString());
+            if(list == null || list.size() == 0){
+                Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
+                return;
             }
-
+            ClassificationService.startActionClassify(this, item.getFileName().toString());
+//            File f = new File(Constants.RESULT_PATH + item.getFileName().toString());
+//            if(f.exists() && !f.isDirectory()) {
+//                // do something
+//                sendMessage(Constants.RESULT_PATH + item.getFileName().toString());
+//            }else{
 //
+//                List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
+//
+//                if(list == null || list.size() == 0){
+//                    Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                ClassificationService.startActionClassify(this, item.getFileName().toString());
+//            }
+//
+
 
 
         } catch (IOException e) {
@@ -181,32 +175,6 @@ public class MainTabActivity extends AppCompatActivity
         }
     }
 
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -225,7 +193,7 @@ public class MainTabActivity extends AppCompatActivity
 
             switch(position) {
                 case 0:
-                    fragment = new TabFragment1();
+                    fragment = new TabFragmentDataCollection();
                     break;
                 case 1:
 //                    fragment = new Graph();
