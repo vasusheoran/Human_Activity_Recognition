@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.TabFragment1"
+    tools:context=".fragments.TabFragmentDataCollection"
     android:id="@+id/fragment_classify">
 
     <!-- TODO: Update blank fragment layout -->
@@ -109,7 +109,7 @@
 -->
 
             <TableRow
-                android:id="@+id/spinner_activity"
+                android:id="@+id/activity_row"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:padding="22dp">
@@ -117,12 +117,30 @@
                 <TextView
                     android:id="@+id/activity_type"
                     android:layout_weight="1"
-                    android:text="Metadata"
+                    android:text="Activity"
                     android:textAlignment="center"
                     android:textSize="18sp"
                     android:textStyle="bold" />
                 <Spinner
                     android:id="@+id/spinner_activity_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+            </TableRow>
+            <TableRow
+                android:id="@+id/orientation_row"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:padding="22dp">
+
+                <TextView
+                    android:id="@+id/orientation_type"
+                    android:layout_weight="1"
+                    android:text="Metadata"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <Spinner
+                    android:id="@+id/spinner_orientation_type"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent" />
             </TableRow>
