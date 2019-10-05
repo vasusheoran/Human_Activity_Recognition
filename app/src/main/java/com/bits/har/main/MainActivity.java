@@ -90,9 +90,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         setContentView(R.layout.activity_main);
         activityPrediction = new ActivityPrediction();
 
-        walkingSlowTextView = findViewById(R.id.walking_prob_slow);
-        walkingNormalTextView = findViewById(R.id.walking_prob_normal);
-        walkingFastTextView = findViewById(R.id.walking_prob_fast);
+//        walkingSlowTextView = findViewById(R.id.walking_prob_slow);
+//        walkingNormalTextView = findViewById(R.id.walking_prob_normal);
+//        walkingFastTextView = findViewById(R.id.walking_prob_fast);
         Switch recordingSwitchtView = findViewById(R.id.record_data);
         Switch predictActivitySwitchtView = findViewById(R.id.switch_enable_voice);
 
@@ -278,9 +278,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public void setPrediction() {
         if(results == null)
             return;
-        walkingFastTextView.setText(Float.toString(round(results[0], 2)));
-        walkingNormalTextView.setText(Float.toString(round(results[1], 2)));
-        walkingSlowTextView.setText(Float.toString(round(results[2], 2)));
+//        walkingFastTextView.setText(Float.toString(round(results[0], 2)));
+//        walkingNormalTextView.setText(Float.toString(round(results[1], 2)));
+//        walkingSlowTextView.setText(Float.toString(round(results[2], 2)));
     }
 
     private float[] toFloatArray(List<Float> list) {
