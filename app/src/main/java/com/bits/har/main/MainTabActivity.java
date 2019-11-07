@@ -31,6 +31,7 @@ import com.bits.har.fragments.TabFragmentDataCollection;
 import com.bits.har.services.ClassificationService;
 import com.bits.har.services.FileWriterService;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -145,28 +146,28 @@ public class MainTabActivity extends AppCompatActivity
         try {
 
 
-            List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
-
-            if(list == null || list.size() == 0){
-                Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            ClassificationService.startActionClassify(this, item.getFileName().toString());
-//            File f = new File(Constants.RESULT_PATH + item.getFileName().toString());
-//            if(f.exists() && !f.isDirectory()) {
-//                // do something
-//                sendMessage(Constants.RESULT_PATH + item.getFileName().toString());
-//            }else{
+//            List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
 //
-//                List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
-//
-//                if(list == null || list.size() == 0){
-//                    Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//                ClassificationService.startActionClassify(this, item.getFileName().toString());
+//            if(list == null || list.size() == 0){
+//                Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
+//                return;
 //            }
-//
+//            ClassificationService.startActionClassify(this, item.getFileName().toString());
+            File f = new File(Constants.RESULT_PATH + item.getFileName().toString());
+            if(f.exists() && !f.isDirectory()) {
+                // do something
+                sendMessage(Constants.RESULT_PATH + item.getFileName().toString());
+            }else{
+
+                List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
+
+                if(list == null || list.size() == 0){
+                    Toast.makeText(this, "Please record data for at least 10 secs ... ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ClassificationService.startActionClassify(this, item.getFileName().toString());
+            }
+
 
 
 

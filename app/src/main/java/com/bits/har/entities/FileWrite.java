@@ -12,17 +12,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class FileWriter {
+public class FileWrite  {
 
-    private static final String TAG = "FileWriter";
-    public void setWriterArray(java.io.FileWriter[] writerArray) {
+    private static final String TAG = "FileWrite";
+    public void setWriterArray(FileWriter[] writerArray) {
         this.writerArray = writerArray;
     }
     public void setCsvFile(File[] csvFile) {
         this.csvFile = csvFile;
     }
 
-    private static java.io.FileWriter writerArray[] = new java.io.FileWriter[3];
+    private static FileWriter writerArray[] = new FileWriter[3];
     private static File csvFile []= new File[3];
 
     public static String getFileName(String activity_type) {
