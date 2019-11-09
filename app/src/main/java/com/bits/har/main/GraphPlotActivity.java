@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+//import static com.bits.har.R.id.graph_view_walking_prob_normal;
+
 public class GraphPlotActivity extends AppCompatActivity {
     private static final String TAG = "GraphPlotActivity";
     private GraphView graph;
@@ -41,7 +43,7 @@ public class GraphPlotActivity extends AppCompatActivity {
     List<Integer> time=  new ArrayList<>();
     List<DataPoint> dp = new ArrayList<>();
     public  Activity graphPlotActivity=null;
-    long slow, normal, fast;
+    long Jogging,Walking,Upstairs,Running,Downstairs,Standing;
 
     private static final String FILE_PATH = "com.bits.har.main.GraphPlotActivity";
 
@@ -78,12 +80,18 @@ public class GraphPlotActivity extends AppCompatActivity {
                 content = line.split(",");
                 dp.add(new DataPoint(i, Integer.parseInt(content[2])));
 
-                if(content[1].equals("Slow")){
-                    this.slow += 5;
-                }else if(content[1].equals("Normal")){
-                    this.normal += 5;
-                }else if(content[1].equals("Fast")){
-                    this.fast += 5;
+                if(content[1].equals("Jogging")){
+                    this.Jogging += 5;
+                }else if(content[1].equals("Walking")){
+                    this.Walking += 5;
+                }else if(content[1].equals("Upstairs")){
+                    this.Upstairs += 5;
+                }else if(content[1].equals("Running")){
+                    this.Running += 5;
+                }else if(content[1].equals("Downstairs")){
+                    this.Downstairs += 5;
+                }else if(content[1].equals("Standing")){
+                    this.Standing += 5;
                 }
             }
 
@@ -134,12 +142,22 @@ public class GraphPlotActivity extends AppCompatActivity {
     }
 
     public void defaultGraph(){
-        TextView walkingFast = findViewById(R.id.graph_view_walking_prob_fast);
-        TextView walkingNormal = findViewById(R.id.graph_view_walking_prob_normal);
-        TextView walkingSlow = findViewById(R.id.graph_view_walking_prob_slow);
-        walkingSlow.setText(splitToComponentTimes(this.slow));
-        walkingNormal.setText(splitToComponentTimes(this.normal));
-        walkingFast.setText(splitToComponentTimes(this.fast));
+        TextView Jogging = findViewById(R.id.tv_dur_jogging);
+        TextView Walking = findViewById(R.id.tv_dur_walking);
+        TextView Upstairs = findViewById(R.id.tv_dur_upstairs);
+        TextView Running = findViewById(R.id.tv_dur_running);
+        TextView Downstairs = findViewById(R.id.tv_dur_Downstairs);
+        TextView Standing = findViewById(R.id.tv_dur_standing);
+
+
+        Jogging.setText(splitToComponentTimes(this.Jogging));
+        Walking.setText(splitToComponentTimes(this.Walking));
+        Upstairs.setText(splitToComponentTimes(this.Upstairs));
+        Running.setText(splitToComponentTimes(this.Running));
+        Downstairs.setText(splitToComponentTimes(this.Downstairs));
+        Standing.setText(splitToComponentTimes(this.Standing));
+
+
 
         graph = findViewById(R.id.graph);
 //        graph.getGridLabelRenderer().setVerticalAxisTitle("Labels");
@@ -164,7 +182,7 @@ public class GraphPlotActivity extends AppCompatActivity {
 //
 //        String[] horizontalLabels = durationLabel.toArray(new String[durationLabel.size()]);
 //        staticLabelsFormatter.setHorizontalLabels(horizontalLabels);
-        staticLabelsFormatter.setVerticalLabels(new String[] {"", "S", "N", "F"});
+        staticLabelsFormatter.setVerticalLabels(new String[] {"",Constants.LABELS[0] , Constants.LABELS[1], Constants.LABELS[2],Constants.LABELS[3],Constants.LABELS[4],Constants.LABELS[5]});
 //        Log.v(TAG, Arrays.toString(horizontalLabels));
 
 
@@ -173,7 +191,7 @@ public class GraphPlotActivity extends AppCompatActivity {
 //        graph.getGridLabelRenderer().setNumHorizontalLabels(5);
         // set manual X bounds
         graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(3);
+        graph.getViewport().setMaxY(6);
         graph.getViewport().setYAxisBoundsManual(true);
 
 

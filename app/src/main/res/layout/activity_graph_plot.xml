@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ededed"
-        android:padding="10dp">
+        android:padding="19dp">
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -41,7 +41,7 @@
             android:id="@+id/graph_view_title_row"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="22dp"
+            android:padding="18dp"
             android:textAlignment="center">
 
             <TextView
@@ -62,67 +62,136 @@
         </TableRow>
 
         <TableRow
-            android:id="@+id/graph_view_standing_row"
+            android:id= "@+id/tr_jogging"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:padding="22dp">
+            android:layout_height="wrap_content"
+            android:minHeight="10sp"
+            android:padding="18dp">
 
             <TextView
-                android:id="@+id/graph_view_walking_title_slow"
+                android:id="@+id/tv_act_jogging"
                 android:layout_weight="1"
-                android:text="@string/activity_1"
+                android:text="@string/Jogging"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/graph_view_walking_prob_slow"
+                android:id="@+id/tv_dur_jogging"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
 
         <TableRow
-            android:id="@+id/graph_view_walking_normal_row"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="22dp">
+            android:id="@+id/tr_walking"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="10sp"
+            android:padding="18dp">
 
             <TextView
-                android:id="@+id/graph_view_walking_title_normal"
+                android:id="@+id/tv_act_walking"
                 android:layout_weight="1"
-                android:text="@string/activity_2"
+                android:text="@string/Walking"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/graph_view_walking_prob_normal"
+                android:id="@+id/tv_dur_walking"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
 
         <TableRow
-            android:id="@+id/graph_view_walking_fast_row"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="22dp">
+            android:id="@+id/tr_upstairs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="10sp"
+            android:padding="18dp">
 
             <TextView
-                android:id="@+id/graph_view_walking_title_fast"
+                android:id="@+id/tv_act_upstairs"
                 android:layout_weight="1"
-                android:text="@string/activity_3"
+                android:text="@string/Upstairs"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/graph_view_walking_prob_fast"
+                android:id="@+id/tv_dur_upstairs"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
+
+        <TableRow
+            android:id="@+id/tr_running"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="18dp">
+
+            <TextView
+                android:id="@+id/tv_act_running"
+                android:layout_weight="1"
+                android:text="@string/Running"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_dur_running"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tr_Downstairs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="10sp"
+            android:padding="18dp">
+
+            <TextView
+                android:id="@+id/tv_act_Downstairs"
+                android:layout_weight="1"
+                android:text="@string/Downstairs"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_dur_Downstairs"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tr_standing"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60px"
+            android:padding="18dp">
+
+            <TextView
+                android:id="@+id/tv_act_standing"
+                android:layout_weight="1"
+                android:text="@string/Standing"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_dur_standing"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
 
 
 

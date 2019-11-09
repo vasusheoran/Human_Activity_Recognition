@@ -27,7 +27,7 @@ public class ClassificationService extends IntentService {
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_CLASSIFY = "com.bits.har.services.action.CLASSIFY";
     private static final String FILE_NAME = "com.bits.har.services.extra.FILE_NAME";
-    private static final String[] labels = {"Fast", "Normal", "Slow"};
+    private String[] labels = Constants.LABELS;
 
     public ClassificationService() {
         super("ClassificationService");
@@ -40,7 +40,7 @@ public class ClassificationService extends IntentService {
      * @see IntentService
      */
     public static void startActionClassify(Context context, String name) {
-        Intent intent = new Intent(context, ClassificationService.class);
+        Intent intent = new Intent(context, ClassificationService.class);//Creates intent of the same class
         intent.setAction(ACTION_CLASSIFY);
         intent.putExtra(FILE_NAME,name);
         context.startService(intent);
@@ -52,7 +52,7 @@ public class ClassificationService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(Intent intent) {  //handles intent created above
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_CLASSIFY.equals(action)) {
