@@ -1,11 +1,13 @@
 package com.bits.har.entities;
 
 import android.app.Activity;
+import android.util.Log;
 
 import com.bits.har.metadata.Constants;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -31,6 +33,33 @@ public class ActivityPrediction{
 
     private String previousResult;
     public TensorFlowClassifier classifier;
+
+    public String normaliseValues(float [] acc, float [] linear, float[] gyro){
+        acc[0] = (acc[0] - Constants.MU[0])/Constants.SIGMA[0];
+        acc[1] = (acc[1] - Constants.MU[1])/Constants.SIGMA[1];
+        acc[2] = (acc[2] - Constants.MU[2])/Constants.SIGMA[2];
+        linear[0] = (linear[0] - Constants.MU[3])/Constants.SIGMA[3];
+        linear[1] = (linear[1] - Constants.MU[4])/Constants.SIGMA[4];
+        linear[2] = (linear[2] - Constants.MU[5])/Constants.SIGMA[5];
+
+        String result =(System.currentTimeMillis()/1000L) + "," +  acc[0] + "," + acc[1] + "," + acc[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2];
+        return result;
+    }
+
+    public float[] normaliseAccelerometerValues(float [] acc){
+        acc[0] = (acc[0] - Constants.MU[0])/Constants.SIGMA[0];
+        acc[1] = (acc[1] - Constants.MU[1])/Constants.SIGMA[1];
+        acc[2] = (acc[2] - Constants.MU[2])/Constants.SIGMA[2];
+
+        return acc;
+    }
+
+    public float[] normaliseLinaerValues(float [] linear){
+        linear[0] = (linear[0] - Constants.MU[3])/Constants.SIGMA[3];
+        linear[1] = (linear[1] - Constants.MU[4])/Constants.SIGMA[4];
+        linear[2] = (linear[2] - Constants.MU[5])/Constants.SIGMA[5];
+        return linear;
+    }
 
 
     public  void updateSensorValues(float[] accel, float[] gyro, float[] fusedOrientation){

@@ -54,7 +54,7 @@ public class MainTabActivity extends AppCompatActivity
         implements TabFragmentDataCollection.OnFragmentInteractionListener, ItemFragment.OnListFragmentInteractionListener {
     private static final String TAG = "MainTabActivity";
 
-    private static Activity activity;
+    public  static Activity activity;
     public static ActivityPrediction activityPrediction;
     public static TensorFlowClassifier tensorFlowClassifier;
     //    private static final String[] labels = {"Fast", "Normal", "Slow"};//never used
@@ -120,38 +120,6 @@ public class MainTabActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
-
-
-      /*  enable_voice_switch = (Switch) findViewById(R.id.switch_enable_voice);
-
-        enable_voice_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    // If the switch button is on
-
-                    Toast.makeText(activity, "Voice Enabled", Toast.LENGTH_SHORT)
-                            .show();
-
-
-                      isVoiceEnabled = true;
-                        new Timer().scheduleAtFixedRate(new updateActivity(), 1000, 3000);
-
-
-                }
-                else {
-                    // If the switch button is off
-
-                        Toast.makeText(activity, "Voice Disabled", Toast.LENGTH_SHORT)
-                            .show();
-
-                        isVoiceEnabled = true;
-
-                }
-            }
-        });
-*/
-
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
                     @Override
@@ -161,7 +129,6 @@ public class MainTabActivity extends AppCompatActivity
                         }
                     }
                 });
-//        textToSpeech.setLanguage(Locale.US);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -183,16 +150,10 @@ public class MainTabActivity extends AppCompatActivity
 
         results = new float[1][6];
 
-        setSensorManager();
     }
 
 
     private void setSensorManager() {
-
-//        SensorManager mSensorManger = (SensorManager) getSystemService(SENSOR_SERVICE);
-//        mFilterSensorData = new FilterSensorData(mSensorManger, activityPrediction);
-
-//        preferences = PreferenceManager.getDefaultSharedPreferences(this); // Create SharedPreferences instance
 
 
         if (serviceManagerIntent == null) {
@@ -248,11 +209,6 @@ public class MainTabActivity extends AppCompatActivity
     public void setPrediction() {
         if (results == null)
             return;
-//        walkingFastTextView.setText(Float.toString(round(results[0], 2)));
-//        walkingNormalTextView.setText(Float.toString(round(results[1], 2)));
-//        walkingSlowTextView.setText(Float.toString(round(results[2], 2)));
-//
-//
         Jogging_tv.setText(Float.toString(round(results[0][0], 2)));
         Walking_tv.setText(Float.toString(round(results[0][1], 2)));
         Upstairs_tv.setText(Float.toString(round(results[0][2], 2)));
@@ -285,9 +241,13 @@ public class MainTabActivity extends AppCompatActivity
     @Override
     public void onListFragmentInteraction(Path item) {
 
-        Toast.makeText(activity, item.getFileName().toString() + " selected", Toast.LENGTH_SHORT).show();//when user selects a ..csv file from the list of csvs
+        Toast.makeText(this, item.getFileName().toString() + " selected", Toast.LENGTH_SHORT).show();//when user selects a ..csv file from the list of csvs
 
         try {
+            //setSensorManager();
+            //this.stopService(serviceManagerIntent);
+            //List<Float> l1 = FileWriterService.getReshapedData(item.toAbsolutePath().toString());
+            //ClassificationService.startActionClassify(this, item.getFileName().toString());
 
 
 //            List<Float> list = FileWriterService.getReshapedData( item.toAbsolutePath().toString());
@@ -316,6 +276,7 @@ public class MainTabActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
 
@@ -386,14 +347,17 @@ public class MainTabActivity extends AppCompatActivity
         }
     }
 
+    static boolean isSensorManagerServiceRunning = false;
 
     public static class CalculateProbabilty extends TimerTask {
         public void run() {
-           // if(!MainTabActivity.isVoiceEnabled)
-           //     return;
+
+            if (!isVoiceEnabled) {
+                this.cancel();
+                return;
+            }
             if (ActivityPrediction.accX.size() < Constants.N_SAMPLES)
                 return;
-
             List<Float> data = new ArrayList<>();
             ActivityPrediction.isPredicting = true;
             data.addAll(ActivityPrediction.accX);

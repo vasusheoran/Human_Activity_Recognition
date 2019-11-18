@@ -23,6 +23,7 @@ import com.bits.har.services.FileWriterService;
 import com.bits.har.services.SensorManagerService;
 
 import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -37,7 +38,7 @@ public class TabFragmentDataCollection extends Fragment implements TextToSpeech.
 
     public static Intent serviceManagerIntent;
     public static Intent fileWriterServiceIntent;
-
+    private TimerTask predictionTimer;
 //    public static boolean isVoiceEnabled;
 
 
@@ -74,10 +75,16 @@ public class TabFragmentDataCollection extends Fragment implements TextToSpeech.
 
                     Toast.makeText(getActivity(), "Voice Enabled", Toast.LENGTH_SHORT)
                             .show();
+                    if(serviceManagerIntent == null){
+                        serviceManagerIntent = new Intent(getActivity(), SensorManagerService.class);
+                        Log.v(TAG, "Created Sensor Manager Service. ");
 
-
-                    MainTabActivity.isVoiceEnabled = true;
-                    new Timer().scheduleAtFixedRate(new MainTabActivity.updateActivity(), 1000, 3000);
+                    }
+                    getActivity().startService(serviceManagerIntent);
+                    Log.v(TAG, "Started Sensor");
+                    //MainTabActivity.isVoiceEnabled = true;
+                    //MainTabActivity.activity.startService(serviceManagerIntent);
+                    new Timer().scheduleAtFixedRate(new MainTabActivity.updateActivity(), 1000, 1000);
                     new Timer().scheduleAtFixedRate(new MainTabActivity.CalculateProbabilty(), 1000, 2000);
 
                 }
@@ -87,7 +94,9 @@ public class TabFragmentDataCollection extends Fragment implements TextToSpeech.
                     Toast.makeText(getActivity(), "Voice Disabled", Toast.LENGTH_SHORT)
                             .show();
 
+                    //MainTabActivity.activity.stopService(serviceManagerIntent);
                     MainTabActivity.isVoiceEnabled = false;
+                    getActivity().stopService(serviceManagerIntent);
 
                 }
             }

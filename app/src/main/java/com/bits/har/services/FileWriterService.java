@@ -144,7 +144,7 @@ public class FileWriterService extends Service {
             }
 
             flag =true;
-            int index = 0;
+
             for ( String row : batch) {
                 String[] values  = row.split(",");
 

@@ -10,6 +10,9 @@ public class Constants {
     public static final int MAGNETOMETER = 3;
     public static final int FUSEDORIENTATION = 4;
 
+    public static final  float[] MU = new float[]{0.197048f,0.276003f,0.534628f, -0.056207f, -0.240377f,-0.186459f};
+    public static final  float[] SIGMA = new float[]{5.454867f,12.333439f, 6.947743f, 5.347857f, 7.901437f, 7.002565f};
+
 
 
     public static final String[] LABELS = {"JOGGING", "RUNNING", "STAIRS_DN", "STAIRS_UP", "STANDING","WALKING"};

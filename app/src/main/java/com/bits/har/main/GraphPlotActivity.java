@@ -60,8 +60,6 @@ public class GraphPlotActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         String path = i.getStringExtra(FILE_PATH);
-
-
         plotGraph(path);
     }
 
@@ -142,20 +140,22 @@ public class GraphPlotActivity extends AppCompatActivity {
     }
 
     public void defaultGraph(){
-        TextView Jogging = findViewById(R.id.tv_dur_jogging);
-        TextView Walking = findViewById(R.id.tv_dur_walking);
-        TextView Upstairs = findViewById(R.id.tv_dur_upstairs);
-        TextView Running = findViewById(R.id.tv_dur_running);
-        TextView Downstairs = findViewById(R.id.tv_dur_Downstairs);
-        TextView Standing = findViewById(R.id.tv_dur_standing);
 
 
-        Jogging.setText(splitToComponentTimes(this.Jogging));
-        Walking.setText(splitToComponentTimes(this.Walking));
-        Upstairs.setText(splitToComponentTimes(this.Upstairs));
-        Running.setText(splitToComponentTimes(this.Running));
-        Downstairs.setText(splitToComponentTimes(this.Downstairs));
-        Standing.setText(splitToComponentTimes(this.Standing));
+
+
+//        TextView Jogging = findViewById(R.id.t);
+//        TextView Walking = findViewById(R.id.tv_dur_walking);
+//        TextView Upstairs = findViewById(R.id.tv_dur_upstairs);
+//        TextView Running = findViewById(R.id.tv_dur_running);
+//        TextView Downstairs = findViewById(R.id.tv_dur_Downstairs);
+//        TextView Standing = findViewById(R.id.tv_dur_standing);
+//        Jogging.setText(splitToComponentTimes(this.Jogging));
+//        Walking.setText(splitToComponentTimes(this.Walking));
+//        Upstairs.setText(splitToComponentTimes(this.Upstairs));
+//        Running.setText(splitToComponentTimes(this.Running));
+//        Downstairs.setText(splitToComponentTimes(this.Downstairs));
+//        Standing.setText(splitToComponentTimes(this.Standing));
 
 
 

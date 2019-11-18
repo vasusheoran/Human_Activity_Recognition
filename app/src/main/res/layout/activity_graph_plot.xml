@@ -37,160 +37,160 @@
 
         <include layout="@layout/graph_view" />
 
-        <TableRow
-            android:id="@+id/graph_view_title_row"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="18dp"
-            android:textAlignment="center">
+        <!--<TableRow-->
+            <!--android:id="@+id/graph_view_title_row"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:padding="18dp"-->
+            <!--android:textAlignment="center">-->
 
-            <TextView
-                android:id="@+id/graph_view_title"
-                android:layout_weight="1"
-                android:text="@string/activity"
-                android:textAlignment="center"
-                android:textSize="20sp"
-                android:textStyle="bold|italic" />
+            <!--<TextView-->
+                <!--android:id="@+id/graph_view_title"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/activity"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="20sp"-->
+                <!--android:textStyle="bold|italic" />-->
 
-            <TextView
-                android:id="@+id/graph_view_textView"
-                android:layout_weight="1"
-                android:text="@string/duration"
-                android:textAlignment="center"
-                android:textSize="20sp"
-                android:textStyle="bold|italic" />
-        </TableRow>
+            <!--<TextView-->
+                <!--android:id="@+id/graph_view_textView"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/duration"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="20sp"-->
+                <!--android:textStyle="bold|italic" />-->
+        <!--</TableRow>-->
 
-        <TableRow
-            android:id= "@+id/tr_jogging"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="10sp"
-            android:padding="18dp">
+        <!--<TableRow-->
+            <!--android:id= "@+id/tr_jogging"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:minHeight="10sp"-->
+            <!--android:padding="18dp">-->
 
-            <TextView
-                android:id="@+id/tv_act_jogging"
-                android:layout_weight="1"
-                android:text="@string/Jogging"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+            <!--<TextView-->
+                <!--android:id="@+id/tv_act_jogging"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/jogging"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp"-->
+                <!--android:textStyle="bold" />-->
 
-            <TextView
-                android:id="@+id/tv_dur_jogging"
-                android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-        </TableRow>
+            <!--<TextView-->
+                <!--android:id="@+id/tv_dur_jogging"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp" />-->
+        <!--</TableRow>-->
 
-        <TableRow
-            android:id="@+id/tr_walking"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="10sp"
-            android:padding="18dp">
+        <!--<TableRow-->
+            <!--android:id="@+id/tr_walking"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:minHeight="10sp"-->
+            <!--android:padding="18dp">-->
 
-            <TextView
-                android:id="@+id/tv_act_walking"
-                android:layout_weight="1"
-                android:text="@string/Walking"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+            <!--<TextView-->
+                <!--android:id="@+id/tv_act_walking"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/Walking"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp"-->
+                <!--android:textStyle="bold" />-->
 
-            <TextView
-                android:id="@+id/tv_dur_walking"
-                android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-        </TableRow>
+            <!--<TextView-->
+                <!--android:id="@+id/tv_dur_walking"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp" />-->
+        <!--</TableRow>-->
 
-        <TableRow
-            android:id="@+id/tr_upstairs"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="10sp"
-            android:padding="18dp">
+        <!--<TableRow-->
+            <!--android:id="@+id/tr_upstairs"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:minHeight="10sp"-->
+            <!--android:padding="18dp">-->
 
-            <TextView
-                android:id="@+id/tv_act_upstairs"
-                android:layout_weight="1"
-                android:text="@string/Upstairs"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+            <!--<TextView-->
+                <!--android:id="@+id/tv_act_upstairs"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/Upstairs"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp"-->
+                <!--android:textStyle="bold" />-->
 
-            <TextView
-                android:id="@+id/tv_dur_upstairs"
-                android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-        </TableRow>
+            <!--<TextView-->
+                <!--android:id="@+id/tv_dur_upstairs"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp" />-->
+        <!--</TableRow>-->
 
-        <TableRow
-            android:id="@+id/tr_running"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="18dp">
+        <!--<TableRow-->
+            <!--android:id="@+id/tr_running"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:padding="18dp">-->
 
-            <TextView
-                android:id="@+id/tv_act_running"
-                android:layout_weight="1"
-                android:text="@string/Running"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+            <!--<TextView-->
+                <!--android:id="@+id/tv_act_running"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/Running"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp"-->
+                <!--android:textStyle="bold" />-->
 
-            <TextView
-                android:id="@+id/tv_dur_running"
-                android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-        </TableRow>
+            <!--<TextView-->
+                <!--android:id="@+id/tv_dur_running"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp" />-->
+        <!--</TableRow>-->
 
-        <TableRow
-            android:id="@+id/tr_Downstairs"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="10sp"
-            android:padding="18dp">
+        <!--<TableRow-->
+            <!--android:id="@+id/tr_Downstairs"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:minHeight="10sp"-->
+            <!--android:padding="18dp">-->
 
-            <TextView
-                android:id="@+id/tv_act_Downstairs"
-                android:layout_weight="1"
-                android:text="@string/Downstairs"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+            <!--<TextView-->
+                <!--android:id="@+id/tv_act_Downstairs"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/Downstairs"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp"-->
+                <!--android:textStyle="bold" />-->
 
-            <TextView
-                android:id="@+id/tv_dur_Downstairs"
-                android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-        </TableRow>
+            <!--<TextView-->
+                <!--android:id="@+id/tv_dur_Downstairs"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp" />-->
+        <!--</TableRow>-->
 
-        <TableRow
-            android:id="@+id/tr_standing"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="60px"
-            android:padding="18dp">
+        <!--<TableRow-->
+            <!--android:id="@+id/tr_standing"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:minHeight="60px"-->
+            <!--android:padding="18dp">-->
 
-            <TextView
-                android:id="@+id/tv_act_standing"
-                android:layout_weight="1"
-                android:text="@string/Standing"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+            <!--<TextView-->
+                <!--android:id="@+id/tv_act_standing"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/Standing"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp"-->
+                <!--android:textStyle="bold" />-->
 
-            <TextView
-                android:id="@+id/tv_dur_standing"
-                android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-        </TableRow>
+            <!--<TextView-->
+                <!--android:id="@+id/tv_dur_standing"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textAlignment="center"-->
+                <!--android:textSize="18sp" />-->
+        <!--</TableRow>-->
 
 
 

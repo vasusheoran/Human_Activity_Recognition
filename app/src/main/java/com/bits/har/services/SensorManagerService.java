@@ -113,6 +113,7 @@ public class SensorManagerService extends Service implements SensorEventListener
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 // Copy new accelerometer data into accel array and calculate orientation
+                accel = activityPrediction.normaliseAccelerometerValues(accel);
                 System.arraycopy(sensorEvent.values, 0, accel, 0, 3);
 //                calculateAccMagOrientation();
                 break;
@@ -125,6 +126,7 @@ public class SensorManagerService extends Service implements SensorEventListener
 
             case Sensor.TYPE_LINEAR_ACCELERATION:
                 // Copy new magnetometer data into magnet array
+                linear = activityPrediction.normaliseLinaerValues(linear);
                 System.arraycopy(sensorEvent.values, 0, linear, 0, 3);
                 break;
         }
@@ -142,10 +144,11 @@ public class SensorManagerService extends Service implements SensorEventListener
     class UpdateWindow extends TimerTask {
         public void run() {
 
-            // Store time in secs
-            String result =(System.currentTimeMillis()/1000L) + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2];
-
-            Log.d(TAG, result);
+            //Log.d(TAG,"Before Normalization : " + (System.currentTimeMillis()/1000L) + "," +  accel[0] + "," + accel[1] + "," + accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2]);
+            String result = activityPrediction.normaliseValues(accel, linear, gyro);
+            //String result = (System.currentTimeMillis()/1000L) + "," +  accel[0] + "," + accel[1] + "," +
+              //      accel[2] + "," + gyro[0] + "," + gyro[1]  + "," + gyro[2] + "," + linear[0] + ","  + linear[1] + ","  + linear[2];
+            Log.d(TAG,"After  Normalization : " + result + "\n");
             if(FileWriterService.fw!=null)
                 FileWriterService.fw.addValues(result, Constants.FUSEDORIENTATION);
             activityPrediction.updateSensorValues(accel,gyro,linear);

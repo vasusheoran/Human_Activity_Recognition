@@ -3,6 +3,9 @@ package com.bits.har.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import com.bits.har.main.GraphPlotActivity;
 import com.bits.har.main.MainTabActivity;
@@ -12,7 +15,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -92,6 +99,19 @@ public class ClassificationService extends IntentService {
 
     }
 
+    public int getIndexOfLargest( float[] array )
+    {
+        if ( array == null || array.length == 0 ) return -1; // null or empty
+
+        int largest = 0;
+        for ( int i = 1; i < array.length; i++ )
+        {
+            if ( array[i] > array[largest] ) largest = i;
+        }
+        return largest; // position of the first largest found
+    }
+
+
     private void handleActionWrite(float[][] result, String fileName) {
         final List<String> timeStamp = FileWriterService.timestamps;
         if (!MainTabActivity.checkPermissions()) return;
@@ -108,20 +128,13 @@ public class ClassificationService extends IntentService {
             FileWriter writerFused = new FileWriter(csvFileFused);
             writerFused.append("time,activity,index,confidence\n");
 
-            for(int i=0; i<result.length;i++){
-
-
-                float max = -1;
-                int idx = -1;
-                for (int j = 0; j < result[i].length; j++) {
-                    if (result[i][j] > max) {
-                        idx = j;
-                        max = result[i][j];
-                    }
-                }
+            for(int i=0; i<timeStamp.size();i++){
+                Log.d(TAG, "-- i -- : " + i );
+                int idx = getIndexOfLargest(result[i]);
 
                 // (idx + 1) is done for better graph views
-                String res =  timeStamp.get(i) + "," + labels[idx] + "," + (idx + 1)+  "," + max + "\n";
+                Log.d(TAG, "i : " + i + ", index : " + idx);
+                String res =  timeStamp.get(i) + "," + labels[idx] + "," + (idx + 1)+  "," + result[i][idx]  + "\n";
                 writerFused.append(res);
             }
             writerFused.flush();
@@ -130,6 +143,8 @@ public class ClassificationService extends IntentService {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e){
             e.printStackTrace();
         }
     }
