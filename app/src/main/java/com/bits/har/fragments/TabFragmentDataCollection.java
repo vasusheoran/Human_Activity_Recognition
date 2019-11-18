@@ -17,9 +17,12 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.bits.har.R;
+import com.bits.har.main.MainTabActivity;
 import com.bits.har.metadata.Constants;
 import com.bits.har.services.FileWriterService;
 import com.bits.har.services.SensorManagerService;
+
+import java.util.Timer;
 
 
 /**
@@ -34,6 +37,10 @@ public class TabFragmentDataCollection extends Fragment implements TextToSpeech.
 
     public static Intent serviceManagerIntent;
     public static Intent fileWriterServiceIntent;
+
+//    public static boolean isVoiceEnabled;
+
+
 
     public static String orientationType = Constants.ORIENTATION[0];
     public static String activityType = Constants.ACTIVITY_TYPE[0];
@@ -56,6 +63,38 @@ public class TabFragmentDataCollection extends Fragment implements TextToSpeech.
         View rootView =  inflater.inflate(R.layout.fragment_tab_fragment1, container, false);
 
         Switch recordingSwitchtView = rootView.findViewById(R.id.record_data);
+
+        Switch enable_voice_switch = rootView.findViewById(R.id.switch_enable_voice);
+
+        enable_voice_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    // If the switch button is on
+
+                    Toast.makeText(getActivity(), "Voice Enabled", Toast.LENGTH_SHORT)
+                            .show();
+
+
+                    MainTabActivity.isVoiceEnabled = true;
+                    new Timer().scheduleAtFixedRate(new MainTabActivity.updateActivity(), 1000, 3000);
+                    new Timer().scheduleAtFixedRate(new MainTabActivity.CalculateProbabilty(), 1000, 2000);
+
+                }
+                else {
+                    // If the switch button is off
+
+                    Toast.makeText(getActivity(), "Voice Disabled", Toast.LENGTH_SHORT)
+                            .show();
+
+                    MainTabActivity.isVoiceEnabled = false;
+
+                }
+            }
+        });
+
+
+
 
         recordingSwitchtView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

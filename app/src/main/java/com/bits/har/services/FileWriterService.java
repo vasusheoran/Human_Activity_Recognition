@@ -130,6 +130,7 @@ public class FileWriterService extends Service {
         reshapedData.addAll(ActivityPrediction.gyroX);
         reshapedData.addAll(ActivityPrediction.gyroY);
         reshapedData.addAll(ActivityPrediction.gyroZ);
+
     }
 
     public static void reshape(List<List<String>> list){

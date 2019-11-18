@@ -12,11 +12,12 @@ public class Constants {
 
 
 
-    public static final String[] LABELS = {"Jogging", "Walking", "Upstairs","Running","Downstairs","Standing"};
+    public static final String[] LABELS = {"JOGGING", "RUNNING", "STAIRS_DN", "STAIRS_UP", "STANDING","WALKING"};
+    //public static final String[] LABELS = {"Jogging", "Walking", "Upstairs","Running","Downstairs","Standing"};
 
     public static final int YIELD = 5;              // A new classification every 5 sec.
 
-    public static final int N_SAMPLES = 50;
+    public static final int N_SAMPLES = 80;
     public static final int BATCH_SIZE = N_SAMPLES * 6;
     public static final int N_FEATURES = 6;
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.bits.har.metadata.Constants;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,8 +85,8 @@ public class ActivityPrediction{
     public ActivityPrediction() {
 //        this.classifier = new TensorFlowClassifier(activity);
     }
-/*
-    private  float round(float d, int decimalPlace) {
+
+/*    private  float round(float d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
